@@ -140,10 +140,18 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Blob.cpp" />
+    <ClCompile Include="draw.cpp" />
+    <ClCompile Include="Food.cpp" />
+    <ClCompile Include="movement.cpp" />
+    <ClCompile Include="Point.cpp" />
+    <ClCompile Include="Word.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Blob.h" />
+    <ClInclude Include="Food.h" />
+    <ClInclude Include="movement.h" />
     <ClInclude Include="Point.h" />
+    <ClInclude Include="Word.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
