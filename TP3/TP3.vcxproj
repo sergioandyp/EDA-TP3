@@ -144,14 +144,15 @@
     <ClCompile Include="Food.cpp" />
     <ClCompile Include="movement.cpp" />
     <ClCompile Include="Point.cpp" />
-    <ClCompile Include="Word.cpp" />
+    <ClCompile Include="World.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Blob.h" />
+    <ClInclude Include="draw.h" />
     <ClInclude Include="Food.h" />
     <ClInclude Include="movement.h" />
     <ClInclude Include="Point.h" />
-    <ClInclude Include="Word.h" />
+    <ClInclude Include="World.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
