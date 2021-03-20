@@ -1,5 +1,7 @@
 #include <iostream>
 #include "movement.h"
+#define _USE_MATH_DEFINES
+#include <math.h>
 
 #include "World.h"
 
@@ -20,7 +22,7 @@ int distanceB2Points(Point& p1, Point& p2)
 
 double getAngleBetweenPoints(Point& p1, Point& p2)
 {
-    double angle = atan2(p2.x - p1.x, p2.y - p1.y) * 180.0 / PI;
+    double angle = atan2(p2.x - p1.x, p2.y - p1.y) * 180.0 / M_PI;
     if (angle < 0)
     {
         angle = 360 + angle;

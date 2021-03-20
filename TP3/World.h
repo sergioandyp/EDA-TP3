@@ -11,12 +11,11 @@ public:
 	unsigned int aliveBlobs;	// Cantidad de blobs actualmente vivos
 };
 
-
 class World {
 public:
 	Blob blobs[MAX_BLOBS];
 	Food* f;
-	unsigned int width;		// Tamano del mundi en pixeles
+	unsigned int width;		// Tamano del mundo en pixeles
 	unsigned int height;
 	Parameters params;
 };
