@@ -3,6 +3,7 @@
 #define MAX_BLOBS  100
 
 class Parameters {
+public:
 	unsigned int foodCount;
 	unsigned int randomJiggleLimit;
 	double deathProb[3];

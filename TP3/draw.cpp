@@ -27,7 +27,7 @@ ALLEGRO_BITMAP* grownBMP = NULL;
 ALLEGRO_BITMAP* goodOldBMP = NULL;
 
 static void drawBackground();
-static void drawBlobs();
+static void drawBlobs(Blob blobs[], unsigned int blobCount);
 
 int main() {
 
@@ -45,11 +45,11 @@ int main() {
 	return 0;
 }
 
-void drawWorld() {
+void drawWorld(World& world) {
 
 	drawBackground();
 
-	drawBlobs();
+	drawBlobs(world.blobs, world.params.aliveBlobs);
 
 	al_flip_display();
 
@@ -118,7 +118,7 @@ static void drawBackground() {
 		al_get_bitmap_height(backgroundBMP), 0, 0, DISP_WIDTH, DISP_HEIGHT, 0);		// Imagen de fondo escalada
 }
 
-static void drawBlobs() {
+static void drawBlobs(Blob blobs[], unsigned int blobCount) {
 
 	al_draw_bitmap(babyBMP, 100, 100, 0);
 	al_draw_bitmap(grownBMP, 200, 200, 0);

@@ -5,7 +5,7 @@
 
 int initWorld();
 
-void destroyWorld();
+void destroyWorld(World& world);
 
 void drawWorld();
 
