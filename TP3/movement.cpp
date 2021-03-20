@@ -150,4 +150,7 @@ void blobMerge(World* myWorld)
 
 }
 
-void blob
+void blob()
+{
+
+}
