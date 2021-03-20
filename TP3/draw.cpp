@@ -5,10 +5,10 @@
 
 #include <iostream>
 
-#define SCALE_FACTOR	1.0		// Factor por el que escalar la pantalla donde 1.0 es el tamano original del background
+//#define SCALE_FACTOR	1.0		// Factor por el que escalar la pantalla donde 1.0 es el tamano original del background
 
-#define DISP_WIDTH	(SCALE_FACTOR*al_get_bitmap_width(backgroundBMP))
-#define DISP_HEIGHT	(SCALE_FACTOR*al_get_bitmap_height(backgroundBMP))
+//#define DISP_WIDTH	(SCALE_FACTOR*al_get_bitmap_width(backgroundBMP))
+//#define DISP_HEIGHT	(SCALE_FACTOR*al_get_bitmap_height(backgroundBMP))
 
 using namespace std;
 
@@ -27,11 +27,11 @@ ALLEGRO_BITMAP* grownBMP = NULL;
 ALLEGRO_BITMAP* goodOldBMP = NULL;
 ALLEGRO_BITMAP* foodBMP = NULL;
 
-static void drawBackground();
+static void drawBackground(unsigned int width, unsigned int height);
 static void drawBlobs(Blob blobs[], unsigned int blobCount);
 static void drawFood(Food food[], unsigned int foodCount);
 
-#define TEST
+//#define TEST
 
 #ifdef TEST
 
@@ -84,7 +84,7 @@ void drawWorld(World& world) {
 
 }
 
-int initWorld() {
+int initWorld(World& world) {
 
 	if (!al_init()) {
 		cout << "Error al inicializar Allegro";
@@ -126,7 +126,7 @@ int initWorld() {
 		return 1;
 	}
 
-	display = al_create_display(DISP_WIDTH, DISP_HEIGHT);
+	display = al_create_display(world.width, world.height);
 	if (!display) {
 		cout << "Error al inicializar el display";
 		return 1;
@@ -148,9 +148,9 @@ void destroyWorld() {
 // Static functions
 
 
-static void drawBackground() {
+static void drawBackground(unsigned int width, unsigned int height) {
 	al_draw_scaled_bitmap(backgroundBMP, 0, 0, al_get_bitmap_width(backgroundBMP),
-		al_get_bitmap_height(backgroundBMP), 0, 0, DISP_WIDTH, DISP_HEIGHT, 0);		// Imagen de fondo escalada
+		al_get_bitmap_height(backgroundBMP), 0, 0, width    , height, 0);		// Imagen de fondo escalada
 }
 
 static void drawBlobs(Blob blobs[], unsigned int blobCount) {

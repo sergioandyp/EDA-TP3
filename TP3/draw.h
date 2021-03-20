@@ -3,7 +3,7 @@
 
 #include "World.h"
 
-int initWorld();
+int initWorld(World& world);
 
 void destroyWorld();
 

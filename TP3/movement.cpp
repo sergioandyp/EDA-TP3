@@ -136,10 +136,10 @@ void blobDeath(World* myWorld)
             myWorld->blobs[i].isAlive = (rand() % 100) < myWorld->params.deathProb[0] ? false : true;
             break;
         case GROWN_BLOB:
-            myWorld->blobs[i].isAlive = (rand() % 100) < myWorld->params.deathProb[1] ? false : true;
+            myWorld->blobs[i].isAlive = (rand() % 100) < myWorld->params.deathProb[1] * 100 ? false : true;
             break;
         case GOOD_OLD_BOB:
-            myWorld->blobs[i].isAlive = (rand() % 100) < myWorld->params.deathProb[2] ? false : true;
+            myWorld->blobs[i].isAlive = (rand() % 100) < myWorld->params.deathProb[2] * 100 ? false : true;
             break;
         }
     }
@@ -150,3 +150,4 @@ void blobMerge(World* myWorld)
 
 }
 
+void blob
