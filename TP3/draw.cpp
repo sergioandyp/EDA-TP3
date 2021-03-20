@@ -25,9 +25,17 @@ ALLEGRO_BITMAP* backgroundBMP = NULL;
 ALLEGRO_BITMAP* babyBMP = NULL;
 ALLEGRO_BITMAP* grownBMP = NULL;
 ALLEGRO_BITMAP* goodOldBMP = NULL;
+ALLEGRO_BITMAP* foodBMP = NULL;
 
 static void drawBackground();
 static void drawBlobs(Blob blobs[], unsigned int blobCount);
+static void drawFood(Food food[], unsigned int foodCount);
+
+#define TEST
+
+#ifdef TEST
+
+#include <ctime>
 
 int main() {
 
@@ -35,7 +43,23 @@ int main() {
 		return 1;
 	}
 
-	drawWorld();
+	srand(time(NULL));
+
+	World world;
+
+	world.params.aliveBlobs = 10;
+	world.params.foodCount = 10;
+
+	world.f = (Food *) malloc(10 * sizeof(Food));
+
+	for (int i = 0; i < 10; i++) {
+		world.blobs[i].isAlive = 1;
+		world.blobs[i].age = BABY_BLOB;
+		world.blobs[i].pos = { (rand() * 900.0 / RAND_MAX), (rand() * 400.0 / RAND_MAX)};
+		world.f[i].pos = { (rand() * 900.0 / RAND_MAX), (rand() * 400.0 / RAND_MAX) };
+	}
+
+	drawWorld(world);
 
 	char x;
 	cin >> x;
@@ -45,9 +69,14 @@ int main() {
 	return 0;
 }
 
+#endif
+
+
 void drawWorld(World& world) {
 
 	drawBackground();
+
+	drawFood(world.f, world.params.foodCount);
 
 	drawBlobs(world.blobs, world.params.aliveBlobs);
 
@@ -91,6 +120,12 @@ int initWorld() {
 		return 1;
 	}
 
+	foodBMP = al_load_bitmap(FOOD_IMG);
+	if (!foodBMP) {
+		cout << "Error al inicializar el foodBMP";
+		return 1;
+	}
+
 	display = al_create_display(DISP_WIDTH, DISP_HEIGHT);
 	if (!display) {
 		cout << "Error al inicializar el display";
@@ -120,8 +155,34 @@ static void drawBackground() {
 
 static void drawBlobs(Blob blobs[], unsigned int blobCount) {
 
-	al_draw_bitmap(babyBMP, 100, 100, 0);
-	al_draw_bitmap(grownBMP, 200, 200, 0);
-	al_draw_bitmap(goodOldBMP, 300, 300, 0);
+	while (blobCount > 0) {
+
+		if (blobs->isAlive) {
+			switch (blobs->age) {
+				case BABY_BLOB:
+					al_draw_bitmap(babyBMP, blobs->pos.x, blobs->pos.y, 0);
+					break;
+				case GROWN_BLOB:
+					al_draw_bitmap(grownBMP, blobs->pos.x, blobs->pos.y, 0);
+					break;
+				case GOOD_OLD_BLOB:
+					al_draw_bitmap(goodOldBMP, blobs->pos.x, blobs->pos.y, 0);
+					break;
+				default:
+					break;
+			}
+			blobCount--;
+		}
+
+		blobs++;
+	}
+
+}
+
+static void drawFood(Food food[], unsigned int foodCount) {
+
+	for (unsigned int i = 0; i < foodCount; i++) {
+		al_draw_bitmap(foodBMP, food[i].pos.x, food[i].pos.y, 0);
+	}
 
 }

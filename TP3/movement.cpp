@@ -1,7 +1,7 @@
 #include <iostream>
 #include "movement.h"
 
-#include "Word.h"
+#include "World.h"
 
 bool isCollision(CollBox& box1, CollBox& box2)
 {

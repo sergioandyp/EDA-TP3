@@ -5,8 +5,8 @@
 
 int initWorld();
 
-void destroyWorld(World& world);
+void destroyWorld();
 
-void drawWorld();
+void drawWorld(World& world);
 
 #endif

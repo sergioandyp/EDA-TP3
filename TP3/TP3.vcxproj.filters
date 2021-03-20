@@ -54,4 +54,21 @@
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
+  <ItemGroup>
+    <Image Include="babyblob.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="background.jpg">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="food.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="goodoldblob.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="grownblob.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+  </ItemGroup>
 </Project>

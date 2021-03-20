@@ -3,7 +3,7 @@
 
 #include "Point.h"
 
-typedef enum { NEW_BORN, BABY_BLOB, GROWN_BLOB, GOOD_OLD_BOB } etaryGroupType;
+typedef enum { NEW_BORN, BABY_BLOB, GROWN_BLOB, GOOD_OLD_BLOB } etaryGroupType;
 
 
 class Blob {
