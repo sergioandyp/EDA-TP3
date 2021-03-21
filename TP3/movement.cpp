@@ -308,11 +308,11 @@ World* createWorld(Parameters& params) {
 
     world->sizes.babySize = 40;
     world->sizes.foodSize = 20;
-    world->sizes.growSize = 40;
-    world->sizes.babySize = 40;
+    world->sizes.growSize = 45;
+    world->sizes.goodOldSize = 80;
 
-    world->height = 470;
     world->width = 900;
+    world->height = 470;
 
     Blob blob;
     blob.isAlive = true;
@@ -404,7 +404,7 @@ void checkColisions(ColReg& reg, colCallback callback, void *data) {
             arrSize = 2;
 
             checkSize += 2;     // Agrego el par a checked
-            checked = realloc(checked, checkSize * sizeof(unsigned int));   // Hago lugar para mas elemento en checked
+            checked = (unsigned int*)realloc(checked, checkSize * sizeof(unsigned int));   // Hago lugar para mas elemento en checked
             if (!checked) return;
             checked[checkSize - 2] = pairs[i][0];     // Agrego el par que no estaba
             checked[checkSize - 1] = pairs[i][1];
@@ -421,12 +421,12 @@ void checkColisions(ColReg& reg, colCallback callback, void *data) {
             if (inArray0 ^ inArray1) {     // Veo si hay un par que no tenia (uno esta y el otro no exclusivamente)
 
                 arrSize++;
-                colArr = realloc(colArr, arrsize * sizeof(unsigned int));   // Hago lugar para otro elemento
+                colArr = (unsigned int*)realloc(colArr, arrSize * sizeof(unsigned int));   // Hago lugar para otro elemento
                 if (!colArr) return;
                 colArr[arrSize - 1] = inArray0 ? pairs[i][1] : pairs[i][0];     // Agrego el par que no estaba
 
                 checkSize++;
-                checked = realloc(checked, checkSize * sizeof(unsigned int));   // Hago lugar para otro elemento en checked
+                checked = (unsigned int*)realloc(checked, checkSize * sizeof(unsigned int));   // Hago lugar para otro elemento en checked
                 if (!checked) return;
                 checked[checkSize - 1] = inArray0 ? pairs[i][1] : pairs[i][0];     // Agrego el par que no estaba
 

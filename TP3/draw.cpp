@@ -11,11 +11,6 @@
 
 #include <iostream>
 
-//#define SCALE_FACTOR	1.0		// Factor por el que escalar la pantalla donde 1.0 es el tamano original del background
-
-//#define DISP_WIDTH	(SCALE_FACTOR*al_get_bitmap_width(backgroundBMP))
-//#define DISP_HEIGHT	(SCALE_FACTOR*al_get_bitmap_height(backgroundBMP))
-
 using namespace std;
 
 #define BACK_IMG		"background.jpg"

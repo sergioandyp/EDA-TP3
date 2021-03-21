@@ -93,7 +93,7 @@ int main()
 			BlobsFoodAction(myWorld);
 
 			ColReg * myColReg = detectPairs( myWorld, GROWN_BLOB );
-			checkColisions(myColReg, colCallback callback, void* data);
+			checkColisions(*myColReg, colCallback callback, void* data);
 
 			drawWorld(*myWorld);
 		}
