@@ -142,6 +142,7 @@
     <ClCompile Include="Allegro.cpp" />
     <ClCompile Include="Blob.cpp" />
     <ClCompile Include="draw.cpp" />
+    <ClCompile Include="Events.cpp" />
     <ClCompile Include="Food.cpp" />
     <ClCompile Include="Geometry.cpp" />
     <ClCompile Include="Main.cpp" />
@@ -154,6 +155,7 @@
     <ClInclude Include="Allegro.h" />
     <ClInclude Include="Blob.h" />
     <ClInclude Include="draw.h" />
+    <ClInclude Include="Events.h" />
     <ClInclude Include="Food.h" />
     <ClInclude Include="Geometry.h" />
     <ClInclude Include="movement.h" />
