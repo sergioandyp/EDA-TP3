@@ -24,6 +24,12 @@ public:
 // FIX: ESTO NO DEBERIA ESTAR ACA
 // Dados los parametros iniciales, crea un World con
 // los 
-World* createWorld(Parameters params);
+World* createWorld(Parameters& params);
+
+void deleteWorld(World* myWorld);
+
+void BlobsFoodAction(World* myWorld);
+
+
 
 #endif

@@ -103,10 +103,12 @@ int initWorld(World& world)
 				{
 					if (al_init_ttf_addon())
 					{
-						font40 = al_load_font("./maiddroid_files/assets/OpenSans-Semibold.ttf", 40, 0);
-						font20 = al_load_font("./maiddroid_files/assets/OpenSans-Semibold.ttf", 20, 0);
-						if (font20 && font40)
+						if (al_install_keyboard())
 						{
+							//font40 = al_load_font("./maiddroid_files/assets/OpenSans-Semibold.ttf", 40, 0);
+							//font20 = al_load_font("./maiddroid_files/assets/OpenSans-Semibold.ttf", 20, 0);
+							//if (font20 && font40)
+							//{
 							babyBMP = al_load_bitmap(BABY_IMG);
 							grownBMP = al_load_bitmap(GROWN_IMG);
 							foodBMP = al_load_bitmap(FOOD_IMG);
@@ -139,11 +141,17 @@ int initWorld(World& world)
 								fprintf(stderr, "failed to load bitmaps\n");
 								error = 2;
 							}
+							//}
+							//else
+							//{
+							//	fprintf(stderr, "failed to create font!\n");
+							//	error = 1;
+							//}
 						}
 						else
 						{
-							fprintf(stderr, "failed to create font!\n");
-							error = 1;
+							fprintf(stderr, "failed to install allegro keyboard!\n");
+							error = 0;
 						}
 					}
 					else
@@ -189,7 +197,7 @@ int initWorld(World& world)
 	return error;
 }
 
-void destroyWorld(int error = 4)
+void destroyWorld(int error)
 {
 	switch (error)
 	{

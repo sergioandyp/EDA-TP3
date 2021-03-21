@@ -21,7 +21,7 @@ public:
 
 	void move(Point& newPos);
 	void move(unsigned int percentSpeed);
-	void moveOffset(Point& offset);
+	//void moveOffset(Point& offset);
 	//void merge(Blob* blobToMerge);
 	void feed();
 	bool isCollision(Blob& blob2);

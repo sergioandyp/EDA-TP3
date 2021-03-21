@@ -5,6 +5,12 @@
 
 #include "World.h"
 
+// Prototipos funciones privadas:
+
+void getCollisionOnFood(Blob* myBlob, Food* myFood, World* MyWorld);
+void blobBirth(World* myWorld, Blob& padre);
+void randPos(Point* myPoint, World* myWorld);
+
 bool isCollision(CollBox& box1, CollBox& box2)
 {
     if (box1.p.x <= box2.p.x + box2.width &&                          // Para ver si dos cajas estan chocando
@@ -17,7 +23,7 @@ bool isCollision(CollBox& box1, CollBox& box2)
 
 void BlobsFoodAction(World* myWorld)
 {
-    int blobsFound = 0;
+    unsigned int blobsFound = 0;
     int i = 0;
     while (blobsFound < myWorld->params.aliveBlobs)
     {
@@ -25,10 +31,10 @@ void BlobsFoodAction(World* myWorld)
 
         blobsFound++;
         bool flag = 0;
-        for (int j = 0; j < myWorld->params.foodCount; j++)
+        for (unsigned int j = 0; j < myWorld->params.foodCount; j++)
         {
             int distance, shortestDistance;
-            if ((distance = distanceB2Points(myWorld->blobs[i].pos, myWorld->f[j].pos)) <= myWorld->blobs[i].smellRadius)
+            if ((distance = (unsigned int)distanceB2Points(myWorld->blobs[i].pos, myWorld->f[j].pos)) <= myWorld->blobs[i].smellRadius)
             {
                 if (flag == 0)
                 {
@@ -112,7 +118,7 @@ void blobBirth(World * myWorld, Blob& padre)   // Para estudiar. No tiene sentid
         std::cout << "UNABLE TO CREATE BLOBS" << std::endl;    // SACAR, NO ES NECESARIO
     }
 }
-
+/*
 void blobDeath(World* myWorld)
 {
     int blobsFound = 0;
@@ -139,7 +145,7 @@ void blobDeath(World* myWorld)
 }
 // primero mergeo los baby, despues mergeo los grown, despues me fijo colision de baby con grown SEGUN KAMMAN{
 
-
+*/
 /*
 void mergeBabyWithBaby(World* myWorld)
 {
@@ -177,22 +183,22 @@ void mergeBabyWithBaby(World* myWorld)
 }*/
 
 
-void growNewBorn(World * myWorld)
-{
-    int blobsFound = 0;
-    int i = 0;
-    while (blobsFound < myWorld->params.aliveBlobs)
-    {
-        while (myWorld->blobs[i].isAlive == false) i++;
-        blobsFound++;
-        if (myWorld->blobs[i].age == NEW_BORN && myWorld->blobs[i].ticksAlive > 10)
-            myWorld->blobs[i].age = BABY_BLOB;
-        else
-            myWorld->blobs[i].ticksAlive++;
-    }
-}
+//void growNewBorn(World * myWorld)
+//{
+//    int blobsFound = 0;
+//    int i = 0;
+//    while (blobsFound < myWorld->params.aliveBlobs)
+//    {
+//        while (myWorld->blobs[i].isAlive == false) i++;
+//        blobsFound++;
+//        if (myWorld->blobs[i].age == NEW_BORN && myWorld->blobs[i].ticksAlive > 10)
+//            myWorld->blobs[i].age = BABY_BLOB;
+//        else
+//            myWorld->blobs[i].ticksAlive++;
+//    }
+//}
 
-
+/*
 void transportateBlob(World * myWorld)
 {
     int blobsFound = 0;
@@ -222,7 +228,7 @@ void transportateBlob(World * myWorld)
             myWorld->blobs[i].pos.y = myWorld->height + myWorld->blobs[i].size / 2 - abs(p3.y);
         }
     }
-}
+}*/
 void moveBlobs(World * myWorld)
 {
     int blobsFound = 0;
@@ -232,12 +238,12 @@ void moveBlobs(World * myWorld)
         while (myWorld->blobs[i].isAlive == false) i++;
         blobsFound++;
 
-        transportateBlob(myWorld);
+        //transportateBlob(myWorld);
         myWorld->blobs[i].move(myWorld->params.percentSpeed);  // 1.0 percentSpeed
         i++;
     }
 }
-
+/*
 void getVertixes(Point& pM, int width, int height, Point* p1, Point* p2, Point* p3, Point* p4)
 {
     p1->x = pM.x - width / 2;          // Allegro sistema de coordenadas
@@ -250,24 +256,9 @@ void getVertixes(Point& pM, int width, int height, Point* p1, Point* p2, Point* 
     p2->y = pM.y - height / 2;
     p4->y = pM.y + height / 2;
 }
+*/
 
 
-void createFood(World* myWorld)
-{
-    myWorld->f = (Food*)realloc(myWorld->f, myWorld->params.foodCount * sizeof(Food));
-    if (myWorld->f == NULL)
-        return;
-}
-
-void deleteFood(World* myWorld)
-{
-    free(myWorld->f);
-}
-
-void createWorld(World* myWorld)
-{
-    createFood(myWorld);
-}
 
 
 // FIX: ESTO NO DEBERIA ESTAR ACA:
@@ -296,11 +287,12 @@ World* createWorld(Parameters& params) {
 
 
     for (int i = 0; i < MAX_BLOBS; i++) {
+        world->blobs[i].isAlive = false;
         if (i < params.aliveBlobs)
         {
             world->blobs[i] = blob;
+            std::cout << "HOLA" << std::endl;
         }
-        world->blobs[i].isAlive = false;
     }
     world->f = (Food*)malloc(sizeof(food) * params.foodCount);
     for (int i = 0; i < params.foodCount; i++)
@@ -319,14 +311,14 @@ void deleteWorld(World* myWorld)
     free(myWorld);
 }
 
-
-typedef unsigned int ColPair[2];
-
-class ColReg {
-public:
-    ColPair *pairs;
-    unsigned int size;
-};
+//
+//typedef unsigned int ColPair[2];
+//
+//class ColReg {
+//public:
+//    ColPair *pairs;
+//    unsigned int size;
+//};
 
 
 
@@ -339,7 +331,7 @@ public:
         - la callback se encarga del merge de todos los elementos
     - Devuelve algo?
 */
- 
+ /*
 void checkColisions(ColReg& reg, colCallback callback, void *data) {
 
     unsigned int* colArr = malloc(2 * sizeof(unsigned int));    // Por lo menos voy a ecesitar 2 lugares
@@ -483,53 +475,53 @@ void mergeBlob(World* myWorld, Blob* b1, Blob* b2, Blob arr[])
     }
 }*/
 
-void mergeBlobs (unsigned int* colArr, unsigned int size, World * myWorld )
-{
-    int i = 0;
-    while (myWorld->blobs[i].isAlive == true && i < MAX_BLOBS) i++;
-    if (i != MAX_BLOBS)
-    {
-        if (myWorld->blobs[*colArr].age == BABY_BLOB)
-            myWorld->blobs[i].age = GROWN_BLOB;
-        else if (myWorld->blobs[*colArr].age == GROWN_BLOB)
-            myWorld->blobs[i].age = GOOD_OLD_BLOB;
-
-        Point p = { 0, 0 };
-        averagePosition(colArr, size, myWorld->blobs, &p);
-        myWorld->blobs[i].pos = p;
-        myWorld->blobs[i].angle = averageDirection();
-        
-        for (int i = 0; i < size; i++)
-        {
-            myWorld->blobs[colArr[i]].isAlive = false;
-        }
-        myWorld->params.aliveBlobs -= (size - 1);
-    }
-}
-
-void averagePosition(unsigned int *colArr, unsigned int size, Blob arr[], Point * myPoint)
-{
-    for (int i = 0; i < size; i++)
-    {
-        myPoint->x += arr[colArr[i]].pos.x;
-        myPoint->y += arr[colArr[i]].pos.y;
-    }
-    myPoint->x /= size;
-    myPoint->y /= size;
-}
-
-
-double averageDirection(void)
-{
-    /*Point a, b;
-    a.x = sin(angle1 * PI / 180.0);
-    a.y = cos(angle1 * PI / 180.0);          // TODO
-
-    b.x = sin(angle2 * PI / 180.0);
-    b.y = cos(angle2 * PI / 180.0);
-
-    double averageAngle = atan2(a.x + b.x, a.y + b.y) * 180.0 / PI;  // OJO ATAN2
-
-    return averageAngle;*/
-    return rand() % 360;                     
-}
+//void mergeBlobs (unsigned int* colArr, unsigned int size, World * myWorld )
+//{
+//    int i = 0;
+//    while (myWorld->blobs[i].isAlive == true && i < MAX_BLOBS) i++;
+//    if (i != MAX_BLOBS)
+//    {
+//        if (myWorld->blobs[*colArr].age == BABY_BLOB)
+//            myWorld->blobs[i].age = GROWN_BLOB;
+//        else if (myWorld->blobs[*colArr].age == GROWN_BLOB)
+//            myWorld->blobs[i].age = GOOD_OLD_BLOB;
+//
+//        Point p = { 0, 0 };
+//        averagePosition(colArr, size, myWorld->blobs, &p);
+//        myWorld->blobs[i].pos = p;
+//        myWorld->blobs[i].angle = averageDirection();
+//        
+//        for (int i = 0; i < size; i++)
+//        {
+//            myWorld->blobs[colArr[i]].isAlive = false;
+//        }
+//        myWorld->params.aliveBlobs -= (size - 1);
+//    }
+//}
+//
+//void averagePosition(unsigned int *colArr, unsigned int size, Blob arr[], Point * myPoint)
+//{
+//    for (int i = 0; i < size; i++)
+//    {
+//        myPoint->x += arr[colArr[i]].pos.x;
+//        myPoint->y += arr[colArr[i]].pos.y;
+//    }
+//    myPoint->x /= size;
+//    myPoint->y /= size;
+//}
+//
+//
+//double averageDirection(void)
+//{
+//    /*Point a, b;
+//    a.x = sin(angle1 * PI / 180.0);
+//    a.y = cos(angle1 * PI / 180.0);          // TODO
+//
+//    b.x = sin(angle2 * PI / 180.0);
+//    b.y = cos(angle2 * PI / 180.0);
+//
+//    double averageAngle = atan2(a.x + b.x, a.y + b.y) * 180.0 / PI;  // OJO ATAN2
+//
+//    return averageAngle;*/
+//    return rand() % 360;                     
+//}

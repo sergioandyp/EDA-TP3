@@ -23,7 +23,7 @@ public:
 	unsigned int growSize;
 	unsigned int goodOldSize;
 	unsigned int foodSize;
-}
+};
 
 
 class World {
