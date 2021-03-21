@@ -8,7 +8,6 @@
 
 typedef void (*colCallback) (unsigned int* colArr, unsigned int size, void* data);
 
-
 typedef unsigned int ColPair[2];
 
 class ColReg {
@@ -22,8 +21,8 @@ class CollBox{
 public:
     CollBox(int width, int height, Point p)
     {
-        this->p.x = p.x - width / 2;
-        this->p.y = p.y - height / 2;    // Asumiendo sistema coordenadas allegro
+        this->p.x = p.x - width / 2.0;
+        this->p.y = p.y - height / 2.0;    // Asumiendo sistema coordenadas allegro
         this->width = width;
         this->height = height;
     }
@@ -50,6 +49,6 @@ void moveBlobs(World& world);
 
 ColReg* detectPairs(World* myWorld, etaryGroupType Age);
 void checkColisions(ColReg& reg, colCallback callback, void* data);
-void mergeBlobs(unsigned int* colArr, unsigned int size, World* myWorld);
+void mergeBlobs(unsigned int* colArr, unsigned int size, void * myWorld);
 
 #endif

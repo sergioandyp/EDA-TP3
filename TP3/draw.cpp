@@ -21,15 +21,15 @@ using namespace std;
 #define FONT			"OpenSans-Semibold.ttf"
 
 // punteros a elementos de allegro
-ALLEGRO_DISPLAY* display;
-ALLEGRO_EVENT_QUEUE* eventQueue;
-ALLEGRO_BITMAP* babyBMP;
-ALLEGRO_BITMAP* grownBMP;
-ALLEGRO_BITMAP* goodOldBMP;
-ALLEGRO_BITMAP* foodBMP;
-ALLEGRO_BITMAP* backgroundBMP;
-ALLEGRO_FONT* font20;
-ALLEGRO_FONT* font40;
+static ALLEGRO_DISPLAY* display;
+static ALLEGRO_EVENT_QUEUE* eventQueue;
+static ALLEGRO_BITMAP* babyBMP;
+static ALLEGRO_BITMAP* grownBMP;
+static ALLEGRO_BITMAP* goodOldBMP;
+static ALLEGRO_BITMAP* foodBMP;
+static ALLEGRO_BITMAP* backgroundBMP;
+static ALLEGRO_FONT* font20;
+static ALLEGRO_FONT* font40;
 
 static void drawBackground(unsigned int width, unsigned int height);
 static void drawBlobs(Blob blobs[], unsigned int blobCount);
@@ -241,6 +241,9 @@ static void drawBackground(unsigned int width, unsigned int height) {
 
 static void drawBlobs(Blob blobs[], unsigned int blobCount) {
 
+	//DEBUG
+	int i = 0;
+
 	while (blobCount > 0) {
 
 		if (blobs->isAlive) {
@@ -250,20 +253,25 @@ static void drawBlobs(Blob blobs[], unsigned int blobCount) {
 				case NEW_BORN:
 					al_draw_bitmap(babyBMP, pos.x, pos.y, 0);
 					al_draw_circle(blobs->pos.x, blobs->pos.y, blobs->smellRadius, al_color_name("red"), 2.0);
+					al_draw_textf(font40, al_map_rgb(0,0,0), blobs->pos.x, blobs->pos.y, 0, "%d", i);	// DEBUG
 					break;
 				case GROWN_BLOB:
 					al_draw_bitmap(grownBMP, pos.x, pos.y, 0);
+					al_draw_textf(font40, al_map_rgb(0,0,0), blobs->pos.x, blobs->pos.y, 0, "%d", i);	// DEBUG
 					break;
 				case GOOD_OLD_BLOB:
 					al_draw_bitmap(goodOldBMP, pos.x, pos.y, 0);
+					al_draw_textf(font40, al_map_rgb(0,0,0), blobs->pos.x, blobs->pos.y, 0, "%d", i);	// DEBUG
 					break;
 				default:
 					break;
 			}
 			blobCount--;
 		}
-
+	
 		blobs++;
+		// DEBUG
+		i++;
 	}
 
 }

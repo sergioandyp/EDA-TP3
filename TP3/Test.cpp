@@ -19,36 +19,30 @@ int main()
 
 	Parameters params;
 
-	params.aliveBlobs = 1;
-	params.foodCount = 5;
-	params.maxSpeed = 3;
+	params.aliveBlobs = 10;          // TODO  randomJiggleLimit, deathProb[], mode
+	params.foodCount = 0;
+	params.maxSpeed = 2.5;
 	params.percentSpeed = 1.0;
 	params.smellRadius = 100;
 
-
-	Blob blob;
-	blob.isAlive = true;
-	blob.age = BABY_BLOB;
-	blob.vel = params.maxSpeed;
-	blob.smellRadius = params.smellRadius;
-	blob.angle = rand() % 360;
-	blob.foodCount = 0;
-	//HARDCODEADO
-	blob.size = 40;
-	blob.pos.x = 100;
-	blob.pos.y = 100;
-
-	Food food;
-	food.size = 20;
-	food.pos.x = 200;
-	food.pos.y = 200;
-
-
-
 	World * myWorld = createWorld(params);
 
+	// Blob blob;
+	// blob.isAlive = true;
+	// blob.age = BABY_BLOB;
+	// blob.vel = params.maxSpeed;
+	// blob.smellRadius = params.smellRadius;
+	// blob.angle = rand() % 360;
+	// blob.foodCount = 0;
+	// //HARDCODEADO
+	// blob.size = 40;
+	// blob.pos.x = 100;
+	// blob.pos.y = 100;
 
-
+	// Food food;
+	// food.size = 20;
+	// food.pos.x = 200;
+	// food.pos.y = 200;
 
 	initWorld(*myWorld);   
 
@@ -87,14 +81,37 @@ int main()
 
 		if (redraw && al_is_event_queue_empty(event_queue)) {
 			redraw = false;
+
 			transportateBlob(myWorld);
 			moveBlobs(*myWorld);
-			//myWorld->blobs[0].pos = translatePoint(myWorld->blobs[0].pos, 1, 300);
 			BlobsFoodAction(myWorld);
+		
+			// SOLO TESTEO
+			//myWorld->blobs[0].pos.x = 100;
+			//myWorld->blobs[0].pos.y = 100;
 
-			ColReg * myColReg = detectPairs( myWorld, GROWN_BLOB );
-			checkColisions(*myColReg, colCallback callback, void* data);
+			//myWorld->blobs[1].pos.x = 130;
+			//myWorld->blobs[1].pos.y = 100;
 
+			//myWorld->blobs[2].pos.x = 150;
+			//myWorld->blobs[2].pos.y = 100;
+
+			//myWorld->blobs[3].pos.x = 130;
+			//myWorld->blobs[3].pos.y = 100;
+
+			//myWorld->blobs[4].pos.x = 115;
+			//myWorld->blobs[4].pos.y = 90;
+			///
+
+			//drawWorld(*myWorld);
+
+			ColReg * myColReg = detectPairs( myWorld, BABY_BLOB );		// Obtengo el registro de colisiones
+			checkColisions(*myColReg, &mergeBlobs, (void*)myWorld);		// Chequeo de colisiones multiples y BlobMerge
+			myColReg = detectPairs( myWorld, GROWN_BLOB );		// Obtengo el registro de colisiones
+			checkColisions(*myColReg, &mergeBlobs, (void*)myWorld);		// Chequeo de colisiones multiples y BlobMerge
+			
+			free(myColReg->pairs);
+			free(myColReg);
 			drawWorld(*myWorld);
 		}
 	}

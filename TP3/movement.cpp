@@ -13,6 +13,8 @@ void getCollisionOnFood(Blob* myBlob, Food* myFood, World* MyWorld);
 void blobBirth(World* myWorld, Blob& padre);
 void randPos(Point* myPoint, World* myWorld);
 void getVertixes(Point& pM, int width, int height, Point* p1, Point* p2, Point* p3, Point* p4);
+double averageDirection(void);
+unsigned int getDifferentValues(ColPair arr[], unsigned int size);
 
 template <typename T> bool isInArray(T elem, T arr[], unsigned int size) {
 
@@ -24,26 +26,6 @@ template <typename T> bool isInArray(T elem, T arr[], unsigned int size) {
 
 }
 
-template <typename T> unsigned int getDifferentValues(T arr[], unsigned int size){
-
-    T *checked = (T*)malloc(sizeof(T));
-    if(!checked) return 0;
-    checked[0] = arr[0];
-    unsigned int checkSize = 1;
-
-    for (int i = 1; i < size; i++) {
-        int j = 0;
-        while (arr[i] == checked[j] && ++j < checkSize);
-        if (j < checkSize) {
-            checkSize++;
-            checked = (T*)realloc(checkSize*sizeof(T));
-            checked[checkSize-1] = arr[i];
-        }
-    }
-
-    free(checked);
-    return checkSize;
-}
 
 bool isCollision(CollBox& box1, CollBox& box2)
 {
@@ -57,35 +39,40 @@ bool isCollision(CollBox& box1, CollBox& box2)
 
 void BlobsFoodAction(World* myWorld)
 {
-    unsigned int blobsFound = 0;
-    int i = 0;
-    while (blobsFound < myWorld->params.aliveBlobs)
+    if(myWorld->f != NULL )
     {
-        while (myWorld->blobs[i].isAlive == false) i++;
-
-        blobsFound++;
-        bool flag = 0;
-        for (unsigned int j = 0; j < myWorld->params.foodCount; j++)
+        unsigned int blobsFound = 0;
+        int i = 0;
+        while (blobsFound < myWorld->params.aliveBlobs)
         {
-            int distance, shortestDistance;
-            if ((distance = (unsigned int)distanceB2Points(myWorld->blobs[i].pos, myWorld->f[j].pos)) <= myWorld->blobs[i].smellRadius)
+            while (myWorld->blobs[i].isAlive == false) i++;
+
+            blobsFound++;
+            bool flag = 0;
+            for (unsigned int j = 0; j < myWorld->params.foodCount; j++)
             {
-                if (flag == 0)
+                int distance, shortestDistance;
+    
+            if ((distance = (unsigned int)distanceB2Points(myWorld->blobs[i].pos, myWorld->f[j].pos)) <= myWorld->blobs[i].smellRadius)
                 {
-                    shortestDistance = distance;
-                    myWorld->blobs[i].angle = getAngleBetweenPoints(myWorld->blobs[i].pos, myWorld->f[j].pos);
-                    getCollisionOnFood(&myWorld->blobs[i], &myWorld->f[j], myWorld);   // !!!!!!! ATENCION !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!1
-                }
-                else if (distance < shortestDistance)
-                {
-                    shortestDistance = distance;
-                    myWorld->blobs[i].angle = getAngleBetweenPoints(myWorld->blobs[i].pos, myWorld->f[j].pos);
-                    getCollisionOnFood(&myWorld->blobs[i], &myWorld->f[j], myWorld);
+                    if (flag == 0)
+                    {
+                        shortestDistance = distance;
+                        myWorld->blobs[i].angle = getAngleBetweenPoints(myWorld->blobs[i].pos, myWorld->f[j].pos);
+                        getCollisionOnFood(&myWorld->blobs[i], &myWorld->f[j], myWorld);   // !!!!!!! ATENCION !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!1
+                    }
+                    else if (distance < shortestDistance)
+                    {
+                        shortestDistance = distance;
+                        myWorld->blobs[i].angle = getAngleBetweenPoints(myWorld->blobs[i].pos, myWorld->f[j].pos);
+                        getCollisionOnFood(&myWorld->blobs[i], &myWorld->f[j], myWorld);
+                    }
                 }
             }
+            i++;
         }
-        i++;
     }
+
 }
 // evalua la colision entre blob y comida. Conviene meterla adentro de getBlobnextDir para bajar complejidad. QUE HACEMOS CON WIDTH Y HEIGHT
 void getCollisionOnFood(Blob* myBlob, Food* myFood, World * MyWorld)
@@ -302,10 +289,14 @@ void transportateBlob(World * myWorld)
 // FIX: ESTO NO DEBERIA ESTAR ACA:
 World* createWorld(Parameters& params) {
 
+    srand(time(NULL));
+
     World* world = (World*) malloc(sizeof(World));
 
-    world->params = params;
+    if (!world) return NULL;
 
+    world->params = params;
+    // Seteo de parametros propios del World
     world->sizes.babySize = 40;
     world->sizes.foodSize = 20;
     world->sizes.growSize = 45;
@@ -314,29 +305,25 @@ World* createWorld(Parameters& params) {
     world->width = 900;
     world->height = 470;
 
+    // Seteo de parametros comunes a todos los blobs
     Blob blob;
-    blob.isAlive = true;
     blob.age = BABY_BLOB;
-    blob.vel = params.maxSpeed;
+    blob.size = world->sizes.babySize;
     blob.smellRadius = params.smellRadius;
-    blob.angle = rand() % 360;
     blob.foodCount = 0;
-    //HARDCODEADO
-    blob.size = 40;
-    blob.pos.x = 100;
-    blob.pos.y = 100;
 
-
-
-    for (int i = 0; i < MAX_BLOBS; i++) {
-        world->blobs[i].isAlive = false;
-        if (i < params.aliveBlobs)
-        {
-            world->blobs[i] = blob;
-            std::cout << "HOLA" << std::endl;
-        }
+    for (int i = 0; i < MAX_BLOBS; i++) {       // Inicializo todos los blobs con su propia velocidad y posicion
+        world->blobs[i] = blob;
+        world->blobs[i].isAlive = i < params.aliveBlobs;
+        world->blobs[i].vel = world->params.mode ? world->params.maxSpeed : rand() * (world->params.maxSpeed / RAND_MAX);
+        world->blobs[i].angle = rand()*(360.0/RAND_MAX);
+        randPos(&(world->blobs[i].pos), world);
     }
+
     world->f = (Food*)malloc(sizeof(Food) * params.foodCount);
+
+    if (!world->f) return world;
+    
     for (int i = 0; i < params.foodCount; i++)
     {
         world->f[i].size = 20;
@@ -389,6 +376,7 @@ void checkColisions(ColReg& reg, colCallback callback, void *data) {
         if (colCount == 0) {    // La primera vez los agrego directamente
             colArr[0] = pairs[0][0];
             colArr[1] = pairs[0][1];
+            arrSize = 2;
 
             checked[0] = pairs[0][0];     // Agrego el par que no estaba
             checked[1] = pairs[0][1];
@@ -452,6 +440,7 @@ ColReg* detectPairs(World * myWorld, etaryGroupType Age)
     int typeBlobs = 0;
     int collisions = 0;
     ColReg * myRegister = (ColReg*)malloc(sizeof(ColReg));
+    myRegister->pairs = NULL;
     myRegister->size = 0;
 
     while (blobsFound < myWorld->params.aliveBlobs)
@@ -467,20 +456,21 @@ ColReg* detectPairs(World * myWorld, etaryGroupType Age)
     int typeFound = 0;
     while (typeFound < typeBlobs - 1)   // el ultimo typeBlob ya va a ser evaluado la colision
     {
-        while (myWorld->blobs[i].isAlive == false && myWorld->blobs[i].age != Age && i < MAX_BLOBS) i++;
+        while (myWorld->blobs[i].isAlive == false || myWorld->blobs[i].age != Age && i < MAX_BLOBS) i++;
         typeFound++;
 
         int k = i + 1;
         int typeFound2 = typeFound;
         while (typeFound2 < typeBlobs)
         {
-            while (myWorld->blobs[k].isAlive == false && myWorld->blobs[k].age != Age && k < MAX_BLOBS) k++;
+            while (myWorld->blobs[k].isAlive == false || myWorld->blobs[k].age != Age && k < MAX_BLOBS) k++;
             typeFound2++;
 
             if (myWorld->blobs[i].isCollision(myWorld->blobs[k]))   /// OJO QUE ES REFERENCIA
             {
                 collisions++;
                 myRegister->pairs = (ColPair*) realloc(myRegister->pairs, collisions * sizeof(ColPair));
+                if (!myRegister->pairs) return myRegister;
                 myRegister->pairs[collisions - 1][0] = i;
                 myRegister->pairs[collisions - 1][1] = k;
                 myRegister->size = collisions;
@@ -514,8 +504,9 @@ ColReg* detectPairs(World * myWorld, etaryGroupType Age)
 //    }
 //}
 
-void mergeBlobs (unsigned int* colArr, unsigned int size, World * myWorld )
+void mergeBlobs (unsigned int* colArr, unsigned int size, void * var )
 {
+    World * myWorld = (World*)var;
     int i = 0;
     while (myWorld->blobs[i].isAlive == true && i < MAX_BLOBS) i++;
     if (i != MAX_BLOBS)
@@ -541,6 +532,12 @@ void mergeBlobs (unsigned int* colArr, unsigned int size, World * myWorld )
         myWorld->blobs[i].smellRadius = myWorld->params.smellRadius;
         myWorld->blobs[i].isAlive = true;
 
+
+        // TEST --------------------------
+        for (int i = 0; i < size; i++) {
+            std::cout << "Pos = "<< colArr[i] << std::endl;
+        }
+        std::cout << i << std::endl;
 
         for (int i = 0; i < size; i++)
         {
@@ -588,4 +585,34 @@ void moveBlobs(World& world) {
         }
         i++;
     }
+}
+
+unsigned int getDifferentValues(ColPair arr[], unsigned int size) {
+
+    if (size > 0) {
+        unsigned int* checked = (unsigned int*)malloc(2 * sizeof(unsigned int));
+        if (!checked) return 0;
+        checked[0] = arr[0][0];
+        checked[1] = arr[0][1];
+        unsigned int checkSize = 2;
+
+        for (int i = 1; i < size; i++) {
+
+            for (int j = 0; j < 2; j++) {
+                int h = 0;
+                while (arr[i][j] != checked[h] && ++h < checkSize);
+                if (h == checkSize) {
+                    checkSize++;
+                    checked = (unsigned int*)realloc(checked, checkSize * sizeof(unsigned int));
+                    if (!checked) return 0;
+                    checked[checkSize - 1] = arr[i][j];
+                }
+
+            }
+        }
+
+        free(checked);
+        return checkSize;
+    }
+    return 0;
 }
