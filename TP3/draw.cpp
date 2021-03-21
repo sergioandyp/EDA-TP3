@@ -18,6 +18,7 @@ using namespace std;
 #define GROWN_IMG		"grownblob.png"
 #define GOOD_OLD_IMG	"goodoldblob.png"
 #define FOOD_IMG		"food.png"
+#define FONT			"OpenSans-Semibold.ttf"
 
 // punteros a elementos de allegro
 ALLEGRO_DISPLAY* display;
@@ -105,48 +106,49 @@ int initWorld(World& world)
 					{
 						if (al_install_keyboard())
 						{
-							//font40 = al_load_font("./maiddroid_files/assets/OpenSans-Semibold.ttf", 40, 0);
-							//font20 = al_load_font("./maiddroid_files/assets/OpenSans-Semibold.ttf", 20, 0);
-							//if (font20 && font40)
-							//{
-							babyBMP = al_load_bitmap(BABY_IMG);
-							grownBMP = al_load_bitmap(GROWN_IMG);
-							foodBMP = al_load_bitmap(FOOD_IMG);
-							goodOldBMP = al_load_bitmap(GOOD_OLD_IMG);
-							backgroundBMP = al_load_bitmap(BACK_IMG);
-							if (babyBMP && grownBMP && foodBMP && backgroundBMP && goodOldBMP)
+							font40 = al_load_font(FONT, 40, 0);
+							font20 = al_load_font(FONT, 20, 0);
+							if (font20 && font40)
 							{
-								eventQueue = al_create_event_queue();
-								if (eventQueue)
-								{
-									display = al_create_display(world.width, world.height);
-									if (display)
-									{
+								babyBMP = al_load_bitmap(BABY_IMG);
+								grownBMP = al_load_bitmap(GROWN_IMG);
+								foodBMP = al_load_bitmap(FOOD_IMG);
+								goodOldBMP = al_load_bitmap(GOOD_OLD_IMG);
+								backgroundBMP = al_load_bitmap(BACK_IMG);
 
+								if (babyBMP && grownBMP && foodBMP && backgroundBMP && goodOldBMP)
+								{
+									eventQueue = al_create_event_queue();
+									if (eventQueue)
+									{
+										display = al_create_display(world.width, world.height);
+										if (display)
+										{
+
+										}
+										else
+										{
+											fprintf(stderr, "failed to create display!\n");
+											error = 4;
+										}
 									}
 									else
 									{
-										fprintf(stderr, "failed to create display!\n");
-										error = 4;
+										fprintf(stderr, "failed to create event queue!\n");
+										error = 3;
 									}
 								}
 								else
 								{
-									fprintf(stderr, "failed to create event queue!\n");
-									error = 3;
+									fprintf(stderr, "failed to load bitmaps\n");
+									error = 2;
 								}
 							}
 							else
 							{
-								fprintf(stderr, "failed to load bitmaps\n");
-								error = 2;
+								fprintf(stderr, "failed to create font!\n");
+								error = 1;
 							}
-							//}
-							//else
-							//{
-							//	fprintf(stderr, "failed to create font!\n");
-							//	error = 1;
-							//}
 						}
 						else
 						{
