@@ -3,4 +3,5 @@
 class Food {
 public:
 	Point pos;
+	unsigned int size;
 };

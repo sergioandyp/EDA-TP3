@@ -1,6 +1,10 @@
 //Clase bloque
 
+#ifndef _MOVE_H_
+#define _MOVE_H_
+
 #include "Point.h"
+#include "World.h"
 
 class CollBox{
 public:
@@ -15,3 +19,11 @@ public:
     int height;
     int width;
 };
+
+
+// FIX: ESTO NO DEBERIA ESTAR ACA
+// Dados los parametros iniciales, crea un World con
+// los 
+World* createWorld(Parameters params);
+
+#endif
