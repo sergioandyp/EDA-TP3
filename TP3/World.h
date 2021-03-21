@@ -5,6 +5,7 @@
 #include "Food.h"
 #define MAX_BLOBS  100
 
+
 class Parameters {
 public:
 	unsigned int foodCount;

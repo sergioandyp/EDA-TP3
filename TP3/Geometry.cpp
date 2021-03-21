@@ -26,7 +26,7 @@ double getAngleBetweenPoints(Point& p1, Point& p2)
 Point translatePoint(Point p, double distance, double angle)
 {
     Point newPoint;
-    newPoint.x = sin(angle) * distance + p.x;
-    newPoint.y = cos(angle) * distance + p.y;
+    newPoint.x = sin(angle * PI / 180.0) * distance + p.x;
+    newPoint.y = cos(angle* PI / 180.0) * distance + p.y;
     return newPoint;
 }

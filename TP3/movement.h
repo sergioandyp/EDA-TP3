@@ -6,6 +6,18 @@
 #include "Point.h"
 #include "World.h"
 
+typedef void (*colCallback) (unsigned int* colArr, unsigned int size, void* data);
+
+
+typedef unsigned int ColPair[2];
+
+class ColReg {
+public:
+    ColPair* pairs;
+    unsigned int size;
+};
+
+
 class CollBox{
 public:
     CollBox(int width, int height, Point p)
@@ -30,6 +42,14 @@ void deleteWorld(World* myWorld);
 
 void BlobsFoodAction(World* myWorld);
 
+void transportateBlob(World * myWorld);
 
+void moveBlobs(World& world);
+
+// ############ COLISIONES = 
+
+ColReg* detectPairs(World* myWorld, etaryGroupType Age);
+void checkColisions(ColReg& reg, colCallback callback, void* data);
+void mergeBlobs(unsigned int* colArr, unsigned int size, World* myWorld);
 
 #endif

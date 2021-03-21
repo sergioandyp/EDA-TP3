@@ -6,21 +6,24 @@ using namespace std;
 #include "draw.h"
 #include "movement.h"
 #include "World.h"
+#include "Geometry.h"
 
 #include <cstdio>
 
-#define FPS 2
+#define FPS 40
 
 int main()
 {
 
+	srand(time(NULL));
+
 	Parameters params;
 
 	params.aliveBlobs = 1;
-	params.foodCount = 1;
+	params.foodCount = 5;
 	params.maxSpeed = 3;
 	params.percentSpeed = 1.0;
-	params.smellRadius = 300;
+	params.smellRadius = 100;
 
 
 	Blob blob;
@@ -40,15 +43,12 @@ int main()
 	food.pos.x = 200;
 	food.pos.y = 200;
 
+
+
 	World * myWorld = createWorld(params);
 
-	myWorld->sizes.babySize = 40;
-	myWorld->sizes.foodSize = 20;
-	myWorld->sizes.growSize = 40;
-	myWorld->sizes.babySize = 40;
 
-	myWorld->height = 470;
-	myWorld->width = 900;
+
 
 	initWorld(*myWorld);   
 
@@ -87,9 +87,13 @@ int main()
 
 		if (redraw && al_is_event_queue_empty(event_queue)) {
 			redraw = false;
-
-			myWorld->blobs[0].move(1.0);
+			transportateBlob(myWorld);
+			moveBlobs(*myWorld);
+			//myWorld->blobs[0].pos = translatePoint(myWorld->blobs[0].pos, 1, 300);
 			BlobsFoodAction(myWorld);
+
+			ColReg * myColReg = detectPairs( myWorld, GROWN_BLOB );
+			checkColisions(myColReg, colCallback callback, void* data);
 
 			drawWorld(*myWorld);
 		}

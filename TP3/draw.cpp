@@ -6,6 +6,9 @@
 #include <allegro5/allegro_font.h>
 #include <allegro5/allegro_ttf.h>
 
+#include <allegro5/allegro_color.h>    // <------- PARA PROBAR EL RADIO DE BUSQUEDA
+
+
 #include <iostream>
 
 //#define SCALE_FACTOR	1.0		// Factor por el que escalar la pantalla donde 1.0 es el tamano original del background
@@ -35,6 +38,8 @@ ALLEGRO_FONT* font40;
 static void drawBackground(unsigned int width, unsigned int height);
 static void drawBlobs(Blob blobs[], unsigned int blobCount);
 static void drawFood(Food food[], unsigned int foodCount);
+static Point posToAll(Point pos, unsigned int width, unsigned int height);
+
 
 //#define TEST
 
@@ -242,15 +247,18 @@ static void drawBlobs(Blob blobs[], unsigned int blobCount) {
 	while (blobCount > 0) {
 
 		if (blobs->isAlive) {
+			Point pos = posToAll(blobs->pos, blobs->size, blobs->size);
 			switch (blobs->age) {
 				case BABY_BLOB:
-					al_draw_bitmap(babyBMP, blobs->pos.x, blobs->pos.y, 0);
+				case NEW_BORN:
+					al_draw_bitmap(babyBMP, pos.x, pos.y, 0);
+					al_draw_circle(blobs->pos.x, blobs->pos.y, blobs->smellRadius, al_color_name("red"), 2.0);
 					break;
 				case GROWN_BLOB:
-					al_draw_bitmap(grownBMP, blobs->pos.x, blobs->pos.y, 0);
+					al_draw_bitmap(grownBMP, pos.x, pos.y, 0);
 					break;
 				case GOOD_OLD_BLOB:
-					al_draw_bitmap(goodOldBMP, blobs->pos.x, blobs->pos.y, 0);
+					al_draw_bitmap(goodOldBMP, pos.x, pos.y, 0);
 					break;
 				default:
 					break;
@@ -266,7 +274,19 @@ static void drawBlobs(Blob blobs[], unsigned int blobCount) {
 static void drawFood(Food food[], unsigned int foodCount) {
 
 	for (unsigned int i = 0; i < foodCount; i++) {
-		al_draw_bitmap(foodBMP, food[i].pos.x, food[i].pos.y, 0);
+		Point pos = posToAll(food[i].pos, food[i].size, food[i].size);
+		al_draw_bitmap(foodBMP, pos.x, pos.y, 0);
 	}
+
+}
+
+// Dado una posicion del centro de un objeto, la transorma en
+// coordenadas a la esquina superior izquierda para imprimir en Allegro
+static Point posToAll(Point pos, unsigned int width, unsigned int height) {
+
+	pos.x -= width/2.0;
+	pos.y -= height/2.0;
+
+	return pos;
 
 }

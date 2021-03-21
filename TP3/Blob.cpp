@@ -4,9 +4,11 @@
 #include "movement.h"
 #include "Geometry.h"
 
-void Blob::move(Point& newPos) {
-	this->pos = newPos;
+void Blob::moveOffset(Point& offSet) {
+	this->pos.x += offSet.x;
+	this->pos.y += offSet.y;
 }
+
 void Blob::move(unsigned int percentSpeed)
 {
 	this->pos = translatePoint(this->pos, this->vel * percentSpeed, this->angle);
@@ -27,3 +29,4 @@ bool Blob::isCollision(Blob& blob2)
 		return 1;
 	return 0;
 }
+

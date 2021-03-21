@@ -3,6 +3,7 @@
 
 #include "Point.h"
 //#include "movement.h"
+//#include "World.h"
 
 typedef enum { NEW_BORN, BABY_BLOB, GROWN_BLOB, GOOD_OLD_BLOB } etaryGroupType;
 enum {BABY_FOOD = 5, GROWN_FOOD = 4, GOOD_OLD_FOOD = 3};
@@ -19,9 +20,9 @@ public:
 	unsigned foodCount;
 	bool isAlive;
 
-	void move(Point& newPos);
+	//void move(Point& newPos);
 	void move(unsigned int percentSpeed);
-	//void moveOffset(Point& offset);
+	void moveOffset(Point& offset);
 	//void merge(Blob* blobToMerge);
 	void feed();
 	bool isCollision(Blob& blob2);
