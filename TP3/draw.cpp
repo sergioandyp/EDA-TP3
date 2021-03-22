@@ -39,6 +39,17 @@ static void drawBlobs(Blob blobs[], unsigned int blobCount);
 static void drawFood(Food food[], unsigned int foodCount);
 static Point posToAll(Point pos, unsigned int width, unsigned int height);
 
+char keys[8][20] = {
+					"mode",
+					"numberOfBlobs",
+					"maxVelBlobs",
+					"%VelBlobs",
+					"smellRadius",
+					"randomJiggleLimit",
+					"deathChance",
+					"foodCount"
+};
+
 
 //#define TEST
 
@@ -301,7 +312,7 @@ static Point posToAll(Point pos, unsigned int width, unsigned int height) {
 
 }
 
-int parseCmdLine(int argc, char* argv[], int(*pCallback) (char*, char*)) {//cant de opciones +params o -1 en error
+int parseCmdLine(int argc, char* argv[], Parameters* params, int(*pCallback) (char*, char*, Parameters*)) {//cant de opciones +params o -1 en error
     int i = 1;//la primer palabra,con indice 0, es el nombre del programa, y esta no se cuenta
     int datos = 0;//params+opciones
     for (i = 1; i < argc; ++i) {
@@ -311,7 +322,7 @@ int parseCmdLine(int argc, char* argv[], int(*pCallback) (char*, char*)) {//cant
                     return ERROR;
                 }
                 else {
-                    if (pCallback(argv[i], argv[i + 1]) == 1) {//si esta todo bien..
+                    if (pCallback(argv[i]+1, argv[i + 1], params) == 1) {//si esta todo bien..
                         ++datos;
                         ++i;//salteo el valor de la clave
                     }
@@ -325,7 +336,7 @@ int parseCmdLine(int argc, char* argv[], int(*pCallback) (char*, char*)) {//cant
             }
         }
         else {//encontre un parametro
-            if (pCallback(NULL, argv[i]) == 1) {//si esta todo bien
+            if (pCallback(NULL, argv[i], params) == 1) {//si esta todo bien
                 ++datos;
             }
             else {//parsecallback tiro error
@@ -336,14 +347,13 @@ int parseCmdLine(int argc, char* argv[], int(*pCallback) (char*, char*)) {//cant
     return datos;
 }
 ////////////////////////////////////////////////////////////
-int parseCallback(char* key, char* value) {//0 si no es valido 1 si si
-
+int parseCallback(char* key, char* value, Parameters* params) {//0 si no es valido 1 si si
+	int i = 0;
     if (key == NULL) {//es un parametro
 		
-        return OK;
+        return NOPARAM;
     }
     else {//es una opcion
-		return NOPARAM;
         if (key[1] == NULL) {//clave vacia devuelve error
             return NOPARAM;
         }
@@ -352,6 +362,80 @@ int parseCallback(char* key, char* value) {//0 si no es valido 1 si si
                 return NOPARAM;
             }
             else {
+				for (i = 0; i <= 7; i++)
+				{
+					if (strcmp(keys[i], key) == 0)
+						break;
+				}
+				if (i == 8)
+					return NOPARAM;
+				switch (i)
+				{
+					case 0:
+						if (value[0] == '1')
+							params->mode = 1;
+						else
+						{
+							if (value[0] == '2')
+								params->mode = 2;
+							else
+								return NOPARAM;
+						}
+						break;
+					case 1:
+						if (value[0] >= '1' && value[0] <= '9')
+						{
+							params->aliveBlobs = atoi(value);
+						}
+						else
+							return NOPARAM;
+						break;
+					case 2:
+						if (value[0] >= '0' && value[0] <= '9')
+						{
+							params->maxSpeed = atoi(value);
+						}
+						else
+							return NOPARAM;
+						break;
+					case 3:
+						if (value[0] >= '0' && value[0] <= '9')
+						{
+							params->percentSpeed = atoi(value);
+						}
+						else
+							return NOPARAM;
+						break;
+					case 4:
+						if (value[0] >= '0' && value[0] <= '9')
+						{
+							params->smellRadius = atoi(value);
+						}
+						else
+							return NOPARAM;
+						break;
+					case 5:
+						if (value[0] >= '1' && value[0] <= '9')
+						{
+							if(atoi(value) <= 360)
+								params->aliveBlobs = atoi(value);
+						}
+						else
+							return NOPARAM;
+						break;
+					case 6:
+							return NOPARAM;
+						break;
+					case 7:
+						if (value[0] >= '0' && value[0] <= '9')
+						{
+							params->foodCount = atoi(value);
+						}
+						else
+							return NOPARAM;
+						break;
+				}
+
                 return OK;
             }
         }

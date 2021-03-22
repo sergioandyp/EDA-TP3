@@ -12,9 +12,9 @@ using namespace std;
 
 #define FPS 40
 
-int main()
+int main(int argc, char* argv[])
 {
-
+	
 	srand(time(NULL));
 
 	Parameters params;
@@ -27,6 +27,8 @@ int main()
 	params.deathProb[0] = 0.000005;
 	params.deathProb[1] = 0.000005;
 	params.deathProb[2] = 0.000005;
+
+	parseCmdLine(argc, argv, &params, parseCallback);
 
 
 	World * myWorld = createWorld(params);
