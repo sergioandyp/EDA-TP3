@@ -49,14 +49,16 @@ void BlobsFoodAction(World* myWorld)
 
             blobsFound++;
             bool flag = 0;
+            int shortestDistance;
             for (unsigned int j = 0; j < myWorld->params.foodCount; j++)
             {
-                int distance, shortestDistance;
+                int distance;
     
-            if ((distance = (unsigned int)distanceB2Points(myWorld->blobs[i].pos, myWorld->f[j].pos)) <= myWorld->blobs[i].smellRadius)
+                if ((distance = (unsigned int)distanceB2Points(myWorld->blobs[i].pos, myWorld->f[j].pos)) <= myWorld->blobs[i].smellRadius)
                 {
                     if (flag == 0)
                     {
+                        flag++;
                         shortestDistance = distance;
                         myWorld->blobs[i].angle = getAngleBetweenPoints(myWorld->blobs[i].pos, myWorld->f[j].pos);
                         getCollisionOnFood(&myWorld->blobs[i], &myWorld->f[j], myWorld);   // !!!!!!! ATENCION !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!1
@@ -118,7 +120,7 @@ void randPos(Point* myPoint, World * myWorld)
 
 
 void blobBirth(World * myWorld, Blob& padre)   // Para estudiar. No tiene sentido pasar un puntero como referencia, no?
-{
+    {
     int i = 0;
     while (myWorld->blobs[i].isAlive == true && i < MAX_BLOBS) i++;
     if (i != MAX_BLOBS)
@@ -214,7 +216,7 @@ void growNewBorn(World * myWorld)
     {
         while (myWorld->blobs[i].isAlive == false) i++;
         blobsFound++;
-        if (myWorld->blobs[i].age == NEW_BORN && myWorld->blobs[i].ticksAlive > 10)
+        if (myWorld->blobs[i].age == NEW_BORN && myWorld->blobs[i].ticksAlive > 120)
             myWorld->blobs[i].age = BABY_BLOB;
         else
             myWorld->blobs[i].ticksAlive++;

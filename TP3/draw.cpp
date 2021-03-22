@@ -19,6 +19,9 @@ using namespace std;
 #define GOOD_OLD_IMG	"goodoldblob.png"
 #define FOOD_IMG		"food.png"
 #define FONT			"OpenSans-Semibold.ttf"
+#define ERROR			-1
+#define NOPARAM			0
+#define OK				1
 
 // punteros a elementos de allegro
 static ALLEGRO_DISPLAY* display;
@@ -253,15 +256,17 @@ static void drawBlobs(Blob blobs[], unsigned int blobCount) {
 				case NEW_BORN:
 					al_draw_bitmap(babyBMP, pos.x, pos.y, 0);
 					al_draw_circle(blobs->pos.x, blobs->pos.y, blobs->smellRadius, al_color_name("red"), 2.0);
-					al_draw_textf(font40, al_map_rgb(0,0,0), blobs->pos.x, blobs->pos.y, 0, "%d", i);	// DEBUG
+					al_draw_textf(font40, al_map_rgb(0,0,0), pos.x, pos.y, 0, "%d", i);	// DEBUG
 					break;
 				case GROWN_BLOB:
 					al_draw_bitmap(grownBMP, pos.x, pos.y, 0);
-					al_draw_textf(font40, al_map_rgb(0,0,0), blobs->pos.x, blobs->pos.y, 0, "%d", i);	// DEBUG
+					al_draw_circle(blobs->pos.x, blobs->pos.y, blobs->smellRadius, al_color_name("red"), 2.0);
+					al_draw_textf(font40, al_map_rgb(0,0,0), pos.x, pos.y, 0, "%d", i);	// DEBUG
 					break;
 				case GOOD_OLD_BLOB:
 					al_draw_bitmap(goodOldBMP, pos.x, pos.y, 0);
-					al_draw_textf(font40, al_map_rgb(0,0,0), blobs->pos.x, blobs->pos.y, 0, "%d", i);	// DEBUG
+					al_draw_circle(blobs->pos.x, blobs->pos.y, blobs->smellRadius, al_color_name("red"), 2.0);
+					al_draw_textf(font40, al_map_rgb(0,0,0), pos.x, pos.y, 0, "%d", i);	// DEBUG
 					break;
 				default:
 					break;
@@ -294,4 +299,62 @@ static Point posToAll(Point pos, unsigned int width, unsigned int height) {
 
 	return pos;
 
+}
+
+int parseCmdLine(int argc, char* argv[], int(*pCallback) (char*, char*)) {//cant de opciones +params o -1 en error
+    int i = 1;//la primer palabra,con indice 0, es el nombre del programa, y esta no se cuenta
+    int datos = 0;//params+opciones
+    for (i = 1; i < argc; ++i) {
+        if (argv[i][0] == '-') {//si hay opcion
+            if (i != (argc - 1)) {//si no es el ultimo elemento que recibe
+                if (argv[i][1] == '\0') {//si es una clave sin valor
+                    return ERROR;
+                }
+                else {
+                    if (pCallback(argv[i], argv[i + 1]) == 1) {//si esta todo bien..
+                        ++datos;
+                        ++i;//salteo el valor de la clave
+                    }
+                    else {//parsecallback tiro error
+                        return ERROR;
+                    }
+                }
+            }
+            else {
+                return ERROR;
+            }
+        }
+        else {//encontre un parametro
+            if (pCallback(NULL, argv[i]) == 1) {//si esta todo bien
+                ++datos;
+            }
+            else {//parsecallback tiro error
+                return ERROR;
+            }
+        }
+    }
+    return datos;
+}
+////////////////////////////////////////////////////////////
+int parseCallback(char* key, char* value) {//0 si no es valido 1 si si
+
+    if (key == NULL) {//es un parametro
+		
+        return OK;
+    }
+    else {//es una opcion
+		return NOPARAM;
+        if (key[1] == NULL) {//clave vacia devuelve error
+            return NOPARAM;
+        }
+        else {
+            if (value == NULL) {//si el valor es null es una clave sin valor y devuelve error
+                return NOPARAM;
+            }
+            else {
+                return OK;
+            }
+        }
+         
+    }
 }

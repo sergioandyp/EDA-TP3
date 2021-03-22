@@ -19,8 +19,8 @@ int main()
 
 	Parameters params;
 
-	params.aliveBlobs = 10;          // TODO  randomJiggleLimit, deathProb[], mode
-	params.foodCount = 0;
+	params.aliveBlobs = 5;          // TODO  randomJiggleLimit, deathProb[], mode
+	params.foodCount = 5;
 	params.maxSpeed = 2.5;
 	params.percentSpeed = 1.0;
 	params.smellRadius = 100;
@@ -82,10 +82,6 @@ int main()
 		if (redraw && al_is_event_queue_empty(event_queue)) {
 			redraw = false;
 
-			transportateBlob(myWorld);
-			moveBlobs(*myWorld);
-			BlobsFoodAction(myWorld);
-		
 			// SOLO TESTEO
 			//myWorld->blobs[0].pos.x = 100;
 			//myWorld->blobs[0].pos.y = 100;
@@ -105,11 +101,16 @@ int main()
 
 			//drawWorld(*myWorld);
 
+			transportateBlob(myWorld);
+			moveBlobs(*myWorld);
+			BlobsFoodAction(myWorld);			
+
+			//growNewBorn(myWorld);
 			ColReg * myColReg = detectPairs( myWorld, BABY_BLOB );		// Obtengo el registro de colisiones
 			checkColisions(*myColReg, &mergeBlobs, (void*)myWorld);		// Chequeo de colisiones multiples y BlobMerge
-			myColReg = detectPairs( myWorld, GROWN_BLOB );		// Obtengo el registro de colisiones
-			checkColisions(*myColReg, &mergeBlobs, (void*)myWorld);		// Chequeo de colisiones multiples y BlobMerge
-			
+			//myColReg = detectPairs( myWorld, GROWN_BLOB );		// Obtengo el registro de colisiones
+			//checkColisions(*myColReg, &mergeBlobs, (void*)myWorld);		// Chequeo de colisiones multiples y BlobMerge
+
 			free(myColReg->pairs);
 			free(myColReg);
 			drawWorld(*myWorld);

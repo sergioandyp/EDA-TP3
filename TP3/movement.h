@@ -45,6 +45,7 @@ void transportateBlob(World * myWorld);
 
 void moveBlobs(World& world);
 
+void growNewBorn(World * myWorld);
 // ############ COLISIONES = 
 
 ColReg* detectPairs(World* myWorld, etaryGroupType Age);
