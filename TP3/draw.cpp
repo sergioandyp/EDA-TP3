@@ -442,3 +442,106 @@ int parseCallback(char* key, char* value, Parameters* params) {//0 si no es vali
          
     }
 }
+
+#include "Events.h"
+
+int keyboardChanges(bool estado, int tecla) {
+
+	int salida = 0;
+
+	if (estado == PRESSED) { // if analizando si la tecla fue presionada
+		switch (tecla) {
+		case ALLEGRO_KEY_0: 
+
+			break;
+
+		case ALLEGRO_KEY_1: 
+
+			break;
+
+		case ALLEGRO_KEY_2: 
+
+			break;
+
+		case ALLEGRO_KEY_3: 
+
+			break;
+
+		case ALLEGRO_KEY_4: 
+
+			break;
+
+		case ALLEGRO_KEY_5: 
+
+			break;
+
+		case ALLEGRO_KEY_6: 
+
+			break;
+
+		case ALLEGRO_KEY_7: 
+
+			break;
+
+		case ALLEGRO_KEY_Q: 
+
+			break;
+
+		case ALLEGRO_KEY_E: 
+
+			break;
+
+		case ALLEGRO_KEY_P: 
+
+			break;
+
+		case ALLEGRO_KEY_C: 
+
+			break;
+
+		case ALLEGRO_KEY_I: 
+
+			break;
+
+		case ALLEGRO_KEY_A: 
+
+			break;
+
+		case ALLEGRO_KEY_B: 
+
+			break;
+		}
+	}
+	return salida;
+}
+
+void checkEvents()
+{
+	ALLEGRO_EVENT evento;
+	int do_exit = 0;
+
+	al_wait_for_event(eventQueue, &evento); //Espera que ocurra un evento
+
+	switch (evento.type) {                    //Se evalua el evento ocurrido y se actua acordemente
+		case ALLEGRO_EVENT_DISPLAY_CLOSE:
+			do_exit = 1;
+			break;
+
+		case ALLEGRO_EVENT_KEY_DOWN:
+			keyboardChanges(PRESSED, evento.keyboard.keycode);
+			break;
+
+		case ALLEGRO_EVENT_KEY_UP:
+			keyboardChanges(NOPRESSED, evento.keyboard.keycode);
+			break;
+
+		case ALLEGRO_EVENT_TIMER:
+			break;
+
+		case ALLEGRO_EVENT_MOUSE_BUTTON_DOWN:
+			break;
+
+		case ALLEGRO_EVENT_MOUSE_BUTTON_UP:
+			break;
+	}
+}
