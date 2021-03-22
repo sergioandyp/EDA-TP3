@@ -255,17 +255,17 @@ static void drawBlobs(Blob blobs[], unsigned int blobCount) {
 				case BABY_BLOB:
 				case NEW_BORN:
 					al_draw_bitmap(babyBMP, pos.x, pos.y, 0);
-					al_draw_circle(blobs->pos.x, blobs->pos.y, blobs->smellRadius, al_color_name("red"), 2.0);
+					//al_draw_circle(blobs->pos.x, blobs->pos.y, blobs->smellRadius, al_color_name("red"), 2.0);
 					al_draw_textf(font40, al_map_rgb(0,0,0), pos.x, pos.y, 0, "%d", i);	// DEBUG
 					break;
 				case GROWN_BLOB:
 					al_draw_bitmap(grownBMP, pos.x, pos.y, 0);
-					al_draw_circle(blobs->pos.x, blobs->pos.y, blobs->smellRadius, al_color_name("red"), 2.0);
+					//al_draw_circle(blobs->pos.x, blobs->pos.y, blobs->smellRadius, al_color_name("red"), 2.0);
 					al_draw_textf(font40, al_map_rgb(0,0,0), pos.x, pos.y, 0, "%d", i);	// DEBUG
 					break;
 				case GOOD_OLD_BLOB:
 					al_draw_bitmap(goodOldBMP, pos.x, pos.y, 0);
-					al_draw_circle(blobs->pos.x, blobs->pos.y, blobs->smellRadius, al_color_name("red"), 2.0);
+					//al_draw_circle(blobs->pos.x, blobs->pos.y, blobs->smellRadius, al_color_name("red"), 2.0);
 					al_draw_textf(font40, al_map_rgb(0,0,0), pos.x, pos.y, 0, "%d", i);	// DEBUG
 					break;
 				default:

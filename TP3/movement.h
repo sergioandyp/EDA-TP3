@@ -52,4 +52,8 @@ ColReg* detectPairs(World* myWorld, etaryGroupType Age);
 void checkColisions(ColReg& reg, colCallback callback, void* data);
 void mergeBlobs(unsigned int* colArr, unsigned int size, void * myWorld);
 
+void makeBlobBirth(World* myWorld);
+
+void blobDeath(World* myWorld);
+
 #endif

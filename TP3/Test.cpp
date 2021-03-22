@@ -24,6 +24,10 @@ int main()
 	params.maxSpeed = 2.5;
 	params.percentSpeed = 1.0;
 	params.smellRadius = 100;
+	params.deathProb[0] = 0.000005;
+	params.deathProb[1] = 0.000005;
+	params.deathProb[2] = 0.000005;
+
 
 	World * myWorld = createWorld(params);
 
@@ -105,11 +109,19 @@ int main()
 			moveBlobs(*myWorld);
 			BlobsFoodAction(myWorld);			
 
-			//growNewBorn(myWorld);
+			makeBlobBirth(myWorld);
+
+			growNewBorn(myWorld);
+
+			//blobDeath(myWorld);
+
+			growNewBorn(myWorld);
+
+			blobDeath(myWorld);
 			ColReg * myColReg = detectPairs( myWorld, BABY_BLOB );		// Obtengo el registro de colisiones
 			checkColisions(*myColReg, &mergeBlobs, (void*)myWorld);		// Chequeo de colisiones multiples y BlobMerge
-			//myColReg = detectPairs( myWorld, GROWN_BLOB );		// Obtengo el registro de colisiones
-			//checkColisions(*myColReg, &mergeBlobs, (void*)myWorld);		// Chequeo de colisiones multiples y BlobMerge
+			myColReg = detectPairs( myWorld, GROWN_BLOB );		// Obtengo el registro de colisiones
+			checkColisions(*myColReg, &mergeBlobs, (void*)myWorld);		// Chequeo de colisiones multiples y BlobMerge
 
 			free(myColReg->pairs);
 			free(myColReg);

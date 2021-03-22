@@ -5,8 +5,6 @@
 
 #include "World.h"
 
-
-
 // Prototipos funciones privadas:
 void averagePosition(unsigned int* colarr, unsigned int size, Blob arr[], Point* mypoint);
 void getCollisionOnFood(Blob* myBlob, Food* myFood, World* MyWorld);
@@ -15,6 +13,9 @@ void randPos(Point* myPoint, World* myWorld);
 void getVertixes(Point& pM, int width, int height, Point* p1, Point* p2, Point* p3, Point* p4);
 double averageDirection(void);
 unsigned int getDifferentValues(ColPair arr[], unsigned int size);
+
+void createBirth(World* myWorld, int indexBlob);
+
 
 template <typename T> bool isInArray(T elem, T arr[], unsigned int size) {
 
@@ -74,8 +75,86 @@ void BlobsFoodAction(World* myWorld)
             i++;
         }
     }
-
 }
+
+void makeBlobBirth(World * myWorld)
+{
+    int blobsFound = 0;
+    int i = 0;
+    int births = 0;
+    int* indexBlobs = NULL;
+    while (blobsFound < myWorld->params.aliveBlobs)
+    {
+        while (myWorld->blobs[i].isAlive == false) i++;
+        blobsFound++;
+
+        switch (myWorld->blobs[i].age)
+        {
+        case NEW_BORN:
+        case BABY_BLOB:
+            if (myWorld->blobs[i].foodCount == BABY_FOOD)
+            {
+                births++;
+                indexBlobs = (int*)realloc(indexBlobs, births * sizeof(int));
+                indexBlobs[births - 1] = i;
+            }
+            break;
+        case GROWN_BLOB:
+            if (myWorld->blobs[i].foodCount == GROWN_FOOD)
+            {
+                births++;
+                indexBlobs = (int*)realloc(indexBlobs, births * sizeof(int));
+                indexBlobs[births - 1] = i;
+            }
+            break;
+
+        case GOOD_OLD_BLOB:
+            if (myWorld->blobs[i].foodCount == GOOD_OLD_FOOD)
+            {
+                births++;
+                indexBlobs = (int*)realloc(indexBlobs, births * sizeof(int));
+                indexBlobs[births - 1] = i;
+            }
+            break;
+        }
+        i++;
+    }
+    for (int k = 0; k < births; k++)
+    {
+        createBirth(myWorld, indexBlobs[k] );
+    }
+    free(indexBlobs);
+}
+
+void createBirth(World * myWorld, int indexBlob)
+{
+    int i = 0;
+    while (myWorld->blobs[i].isAlive == true && i < MAX_BLOBS) i++;
+    if (i != MAX_BLOBS)
+    {
+        myWorld->blobs[i].age = NEW_BORN;
+        myWorld->blobs[i].pos = myWorld->blobs[indexBlob].pos;
+        myWorld->blobs[i].angle = rand() % 360;  // No convendra un constructor
+        myWorld->blobs[i].size = myWorld->sizes.babySize;
+        myWorld->blobs[i].ticksAlive = 0;
+        myWorld->blobs[i].vel = myWorld->blobs[indexBlob].vel;
+        myWorld->blobs[i].foodCount = 0;
+        myWorld->blobs[i].smellRadius = myWorld->blobs[indexBlob].smellRadius;
+        myWorld->blobs[i].isAlive = true;
+        myWorld->blobs[indexBlob].foodCount = 0;
+
+        myWorld->params.aliveBlobs++;          // <---- RECORDAR ESTO DE INCREMENTAR LOS BLOBS SI CREAS
+    }
+    else
+    {
+        std::cout << "UNABLE TO CREATE BLOBS" << std::endl;    // SACAR, NO ES NECESARIO
+    }
+}
+
+
+
+
+
 // evalua la colision entre blob y comida. Conviene meterla adentro de getBlobnextDir para bajar complejidad. QUE HACEMOS CON WIDTH Y HEIGHT
 void getCollisionOnFood(Blob* myBlob, Food* myFood, World * MyWorld)
 {
@@ -84,30 +163,29 @@ void getCollisionOnFood(Blob* myBlob, Food* myFood, World * MyWorld)
     if (isCollision(c1, c2))
     {
         myBlob->feed();
-        switch (myBlob->age)
-        {
-        case NEW_BORN:
-        case BABY_BLOB:
-            if (myBlob->foodCount == BABY_FOOD)
-            {
-                blobBirth(MyWorld, *myBlob);
-            }
-            break;
-        case GROWN_BLOB:
-            if (myBlob->foodCount == GROWN_FOOD)
-            {
-                blobBirth(MyWorld, *myBlob);
-            }
-            break;
+        //switch (myBlob->age)
+        //{
+        //case NEW_BORN:
+        //case BABY_BLOB:
+        //    if (myBlob->foodCount == BABY_FOOD)
+        //    {
+        //        blobBirth(MyWorld, *myBlob);
+        //    }
+        //    break;
+        //case GROWN_BLOB:
+        //    if (myBlob->foodCount == GROWN_FOOD)
+        //    {
+        //        blobBirth(MyWorld, *myBlob);
+        //    }
+        //    break;
 
-        case GOOD_OLD_BLOB:
-            if (myBlob->foodCount == GOOD_OLD_FOOD)
-            {
-                blobBirth(MyWorld, *myBlob);
-            }
-            break;
-        }
-
+        //case GOOD_OLD_BLOB:
+        //    if (myBlob->foodCount == GOOD_OLD_FOOD)
+        //    {
+        //        blobBirth(MyWorld, *myBlob);
+        //    }
+        //    break;
+        //}
         randPos(&myFood->pos, MyWorld);
     }
 }
@@ -119,35 +197,36 @@ void randPos(Point* myPoint, World * myWorld)
 }
 
 
-void blobBirth(World * myWorld, Blob& padre)   // Para estudiar. No tiene sentido pasar un puntero como referencia, no?
-    {
-    int i = 0;
-    while (myWorld->blobs[i].isAlive == true && i < MAX_BLOBS) i++;
-    if (i != MAX_BLOBS)
-    {
-        myWorld->blobs[i].age = NEW_BORN;
-        myWorld->blobs[i].pos = padre.pos;
-        myWorld->blobs[i].angle = rand() % 360;  // No convendra un constructor
-        myWorld->blobs[i].size = myWorld->sizes.babySize;
-        myWorld->blobs[i].ticksAlive = 0;
-        myWorld->blobs[i].vel = padre.vel;
-        myWorld->blobs[i].foodCount = 0;
-        myWorld->blobs[i].smellRadius = padre.smellRadius;
-        myWorld->blobs[i].isAlive = true;
-        padre.foodCount = 0;
+//void blobBirth(World * myWorld, Blob& padre)   // Para estudiar. No tiene sentido pasar un puntero como referencia, no?
+//{
+//    int i = 0;
+//    while (myWorld->blobs[i].isAlive == true && i < MAX_BLOBS) i++;
+//    if (i != MAX_BLOBS)
+//    {
+//        myWorld->blobs[i].age = NEW_BORN;
+//        myWorld->blobs[i].pos = padre.pos;
+//        myWorld->blobs[i].angle = rand() % 360;  // No convendra un constructor
+//        myWorld->blobs[i].size = myWorld->sizes.babySize;
+//        myWorld->blobs[i].ticksAlive = 0;
+//        myWorld->blobs[i].vel = padre.vel;
+//        myWorld->blobs[i].foodCount = 0;
+//        myWorld->blobs[i].smellRadius = padre.smellRadius;
+//        myWorld->blobs[i].isAlive = true;
+//        padre.foodCount = 0;
+//
+//        myWorld->params.aliveBlobs++;          // <---- RECORDAR ESTO DE INCREMENTAR LOS BLOBS SI CREAS
+//    }
+//    else
+//    {
+//        std::cout << "UNABLE TO CREATE BLOBS" << std::endl;    // SACAR, NO ES NECESARIO
+//    }
+//}
 
-        myWorld->params.aliveBlobs++;          // <---- RECORDAR ESTO DE INCREMENTAR LOS BLOBS SI CREAS
-    }
-    else
-    {
-        std::cout << "UNABLE TO CREATE BLOBS" << std::endl;    // SACAR, NO ES NECESARIO
-    }
-}
-/*
 void blobDeath(World* myWorld)
 {
     int blobsFound = 0;
     int i = 0;
+    int killedBlobs = 0;
     while (blobsFound < myWorld->params.aliveBlobs)
     {
         while (myWorld->blobs[i].isAlive == false) i++;
@@ -156,21 +235,34 @@ void blobDeath(World* myWorld)
         {
         case NEW_BORN:
         case BABY_BLOB:
-            myWorld->blobs[i].isAlive = (rand() % 100) < myWorld->params.deathProb[0] * 100.0 ? false : true;
+            myWorld->blobs[i].isAlive = (rand() % 10000) < myWorld->params.deathProb[0] * 100.0 ? false : true;
+            if (myWorld->blobs[i].isAlive == false)
+            {
+                killedBlobs++;
+            }
             break;
         case GROWN_BLOB:
-            myWorld->blobs[i].isAlive = (rand() % 100) < myWorld->params.deathProb[1] * 100.0 ? false : true;
+            myWorld->blobs[i].isAlive = (rand() % 10000) < myWorld->params.deathProb[1] * 100.0 ? false : true;
+            if (myWorld->blobs[i].isAlive == false)
+            {
+                killedBlobs++;
+            }
             break;
         case GOOD_OLD_BLOB:
-            myWorld->blobs[i].isAlive = (rand() % 100) < myWorld->params.deathProb[2] * 100.0 ? false : true;
+            myWorld->blobs[i].isAlive = (rand() % 10000) < myWorld->params.deathProb[2] * 100.0 ? false : true;
+            if (myWorld->blobs[i].isAlive == false)
+            {
+                killedBlobs++;
+            }
             break;
         }
         i++;
     }
+    myWorld->params.aliveBlobs -= killedBlobs;
 }
 // primero mergeo los baby, despues mergeo los grown, despues me fijo colision de baby con grown SEGUN KAMMAN{
 
-*/
+
 /*
 void mergeBabyWithBaby(World* myWorld)
 {
