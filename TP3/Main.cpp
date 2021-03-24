@@ -32,7 +32,7 @@ int main(int argc, char* argv[])
 
 	Parameters params;
 
-	if (parseCmdLine(argc, argv, &params, parserCallback) == -1)
+	if (parseCmdLine(argc, argv, &params, parserCallback) == -1)     
 	{
 		fprintf(stderr, "Input parameters are incorrect\n");
 		return 0;
@@ -158,21 +158,27 @@ int parserCallback(char* key, char* value, void* parameters) {//0 si no es valid
 						{
 							params->deathProb[0] = strtod(value,NULL);
 						}
+						else {
 							return NOPARAM;
+						}
 						break;
 					case 7:
 						if (value[0] >= '0' && value[0] <= '9')
 						{
 							params->deathProb[1] = strtod(value, NULL);
 						}
+						else {
 							return NOPARAM;
+						}
 						break;
 					case 8:
 						if (value[0] >= '0' && value[0] <= '9')
 						{
 							params->deathProb[2] = strtod(value, NULL);
 						}
+						else {
 							return NOPARAM;
+						}
 						break;
 					case 9:
 						if (value[0] >= '0' && value[0] <= '9')

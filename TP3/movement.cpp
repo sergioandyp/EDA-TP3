@@ -319,7 +319,7 @@ World* createWorld(Parameters& params) {
     for (int i = 0; i < MAX_BLOBS; i++) {       // Inicializo todos los blobs con su propia velocidad y posicion
         world->blobs[i] = blob;
         world->blobs[i].isAlive = i < params.aliveBlobs;
-        world->blobs[i].vel = world->params.mode == MODE_1 ? world->params.maxSpeed : rand() * (world->params.maxSpeed / RAND_MAX);
+        world->blobs[i].vel = world->params.mode == MODE_1 ? world->params.maxSpeed : (rand()+1) * (world->params.maxSpeed / (RAND_MAX+1));
         world->blobs[i].angle = rand()*(360.0/RAND_MAX);
         randPos(&(world->blobs[i].pos), world);
     }
@@ -556,11 +556,6 @@ void mergeBlobs (unsigned int* colArr, unsigned int size, void * var )
         myWorld->blobs[i].isAlive = true;
 
 
-        // TEST --------------------------
-        for (int i = 0; i < size; i++) {
-            std::cout << "Pos = "<< colArr[i] << std::endl;
-        }
-        std::cout << i << std::endl;
 
         for (int i = 0; i < size; i++)
         {
