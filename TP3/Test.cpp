@@ -19,17 +19,21 @@ int main(int argc, char* argv[])
 
 	Parameters params;
 
-	params.aliveBlobs = 5;          // TODO  randomJiggleLimit, deathProb[], mode
-	params.foodCount = 5;
-	params.maxSpeed = 2.5;
+	params.aliveBlobs = 5;       
+	params.foodCount = 15;
+	params.maxSpeed = 10;
 	params.percentSpeed = 1.0;
 	params.smellRadius = 100;
-	params.deathProb[0] = 0.000005;
-	params.deathProb[1] = 0.000005;
-	params.deathProb[2] = 0.000005;
+	params.deathProb[0] = 0.005;
+	params.deathProb[1] = 0.005;
+	params.deathProb[2] = 0.005;
+	params.mode = MODE_1;
 
-	parseCmdLine(argc, argv, &params, parseCallback);
-
+	if(parseCmdLine(argc, argv, &params, parseCallback) == -1)
+	{
+		fprintf(stderr, "Input parameters are incorrect\n");
+		return 0;
+	}
 
 	World * myWorld = createWorld(params);
 
@@ -75,6 +79,7 @@ int main(int argc, char* argv[])
 	long ticksAllegro = 0;
 
 	while (!display_close) {	//Se ejecuta la animacion y el algoritmo de limpieza
+
 		ALLEGRO_EVENT ev;
 		if (al_get_next_event(event_queue, &ev))
 		{
@@ -88,6 +93,12 @@ int main(int argc, char* argv[])
 		if (redraw && al_is_event_queue_empty(event_queue)) {
 			redraw = false;
 
+			/*
+		checkEvents(redraw, display_close);
+
+		if (redraw && al_is_event_queue_empty(event_queue))
+		{
+			redraw = false;*/
 			// SOLO TESTEO
 			//myWorld->blobs[0].pos.x = 100;
 			//myWorld->blobs[0].pos.y = 100;
@@ -109,9 +120,9 @@ int main(int argc, char* argv[])
 
 			transportateBlob(myWorld);
 			moveBlobs(*myWorld);
-			BlobsFoodAction(myWorld);			
-
+			BlobsFoodAction(myWorld);
 			makeBlobBirth(myWorld);
+
 
 			growNewBorn(myWorld);
 
@@ -120,9 +131,9 @@ int main(int argc, char* argv[])
 			growNewBorn(myWorld);
 
 			blobDeath(myWorld);
-			ColReg * myColReg = detectPairs( myWorld, BABY_BLOB );		// Obtengo el registro de colisiones
+			ColReg* myColReg = detectPairs(myWorld, BABY_BLOB);		// Obtengo el registro de colisiones
 			checkColisions(*myColReg, &mergeBlobs, (void*)myWorld);		// Chequeo de colisiones multiples y BlobMerge
-			myColReg = detectPairs( myWorld, GROWN_BLOB );		// Obtengo el registro de colisiones
+			myColReg = detectPairs(myWorld, GROWN_BLOB);		// Obtengo el registro de colisiones
 			checkColisions(*myColReg, &mergeBlobs, (void*)myWorld);		// Chequeo de colisiones multiples y BlobMerge
 
 			free(myColReg->pairs);

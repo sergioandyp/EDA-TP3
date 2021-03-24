@@ -5,6 +5,7 @@
 #include "Food.h"
 #define MAX_BLOBS  100
 
+enum {MODE_1, MODE_2};
 
 class Parameters {
 public:

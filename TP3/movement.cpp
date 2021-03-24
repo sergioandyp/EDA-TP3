@@ -8,7 +8,7 @@
 // Prototipos funciones privadas:
 void averagePosition(unsigned int* colarr, unsigned int size, Blob arr[], Point* mypoint);
 void getCollisionOnFood(Blob* myBlob, Food* myFood, World* MyWorld);
-void blobBirth(World* myWorld, Blob& padre);
+
 void randPos(Point* myPoint, World* myWorld);
 void getVertixes(Point& pM, int width, int height, Point* p1, Point* p2, Point* p3, Point* p4);
 double averageDirection(unsigned int* colarr, unsigned int size, Blob arr[], unsigned int extra);
@@ -17,6 +17,7 @@ unsigned int getDifferentValues(ColPair arr[], unsigned int size);
 double averageSpeed(unsigned int* colArr, unsigned int size, World* myWorld);
 
 void createBirth(World* myWorld, int indexBlob);
+
 
 
 template <typename T> bool isInArray(T elem, T arr[], unsigned int size) {
@@ -136,7 +137,7 @@ void createBirth(World * myWorld, int indexBlob)
     {
         myWorld->blobs[i].age = NEW_BORN;
         myWorld->blobs[i].pos = myWorld->blobs[indexBlob].pos;
-        myWorld->blobs[i].angle = rand() % 360;  // No convendra un constructor
+        myWorld->blobs[i].angle = rand() % 360; 
         myWorld->blobs[i].size = myWorld->sizes.babySize;
         myWorld->blobs[i].ticksAlive = 0;
         myWorld->blobs[i].vel = myWorld->blobs[indexBlob].vel;
@@ -145,86 +146,35 @@ void createBirth(World * myWorld, int indexBlob)
         myWorld->blobs[i].isAlive = true;
         myWorld->blobs[indexBlob].foodCount = 0;
 
-        myWorld->params.aliveBlobs++;          // <---- RECORDAR ESTO DE INCREMENTAR LOS BLOBS SI CREAS
+        myWorld->params.aliveBlobs++;        
     }
     else
     {
-        std::cout << "UNABLE TO CREATE BLOBS" << std::endl;    // SACAR, NO ES NECESARIO
+        std::cout << "UNABLE TO CREATE BLOBS" << std::endl;  
     }
 }
 
 
-
-
-
-// evalua la colision entre blob y comida. Conviene meterla adentro de getBlobnextDir para bajar complejidad. QUE HACEMOS CON WIDTH Y HEIGHT
 void getCollisionOnFood(Blob* myBlob, Food* myFood, World * MyWorld)
 {
-    CollBox c1(myBlob->size, myBlob->size, myBlob->pos);             // EL  HEIGHT Y WIDTH ES DISTINTO OBVIO
-    CollBox c2(myFood->size, myFood->size, myFood->pos);            // Habra que hacer un miembro para width y height? o DEFINE ? o PARAMETRO ?
+    CollBox c1(myBlob->size, myBlob->size, myBlob->pos);           
+    CollBox c2(myFood->size, myFood->size, myFood->pos);            
     if (isCollision(c1, c2))
     {
         myBlob->feed();
-        //switch (myBlob->age)
-        //{
-        //case NEW_BORN:
-        //case BABY_BLOB:
-        //    if (myBlob->foodCount == BABY_FOOD)
-        //    {
-        //        blobBirth(MyWorld, *myBlob);
-        //    }
-        //    break;
-        //case GROWN_BLOB:
-        //    if (myBlob->foodCount == GROWN_FOOD)
-        //    {
-        //        blobBirth(MyWorld, *myBlob);
-        //    }
-        //    break;
 
-        //case GOOD_OLD_BLOB:
-        //    if (myBlob->foodCount == GOOD_OLD_FOOD)
-        //    {
-        //        blobBirth(MyWorld, *myBlob);
-        //    }
-        //    break;
-        //}
         randPos(&myFood->pos, MyWorld);
     }
 }
 
 void randPos(Point* myPoint, World * myWorld)
 {
-    myPoint->x = rand() % myWorld->width;   // ES UNA CONSTANTE ?
-    myPoint->y = rand() % myWorld->height;  // CHEQUIAR SI CAE ARRIBA DE ALGO? POR LA FOOD LO DIGO
+    myPoint->x = rand() % myWorld->width;  
+    myPoint->y = rand() % myWorld->height;  
 }
 
 
-//void blobBirth(World * myWorld, Blob& padre)   // Para estudiar. No tiene sentido pasar un puntero como referencia, no?
-//{
-//    int i = 0;
-//    while (myWorld->blobs[i].isAlive == true && i < MAX_BLOBS) i++;
-//    if (i != MAX_BLOBS)
-//    {
-//        myWorld->blobs[i].age = NEW_BORN;
-//        myWorld->blobs[i].pos = padre.pos;
-//        myWorld->blobs[i].angle = rand() % 360;  // No convendra un constructor
-//        myWorld->blobs[i].size = myWorld->sizes.babySize;
-//        myWorld->blobs[i].ticksAlive = 0;
-//        myWorld->blobs[i].vel = padre.vel;
-//        myWorld->blobs[i].foodCount = 0;
-//        myWorld->blobs[i].smellRadius = padre.smellRadius;
-//        myWorld->blobs[i].isAlive = true;
-//        padre.foodCount = 0;
-//
-//        myWorld->params.aliveBlobs++;          // <---- RECORDAR ESTO DE INCREMENTAR LOS BLOBS SI CREAS
-//    }
-//    else
-//    {
-//        std::cout << "UNABLE TO CREATE BLOBS" << std::endl;    // SACAR, NO ES NECESARIO
-//    }
-//}
-
-void blobDeath(World* myWorld)
+void blobDeath(World* myWorld)  
 {
     int blobsFound = 0;
     int i = 0;
@@ -237,21 +187,21 @@ void blobDeath(World* myWorld)
         {
         case NEW_BORN:
         case BABY_BLOB:
-            myWorld->blobs[i].isAlive = (rand() % 10000) < myWorld->params.deathProb[0] * 100.0 ? false : true;
+            myWorld->blobs[i].isAlive = (double)rand() / (double)RAND_MAX < myWorld->params.deathProb[0]  ? false : true;
             if (myWorld->blobs[i].isAlive == false)
             {
                 killedBlobs++;
             }
             break;
         case GROWN_BLOB:
-            myWorld->blobs[i].isAlive = (rand() % 10000) < myWorld->params.deathProb[1] * 100.0 ? false : true;
+            myWorld->blobs[i].isAlive = (double)rand() / (double)RAND_MAX < myWorld->params.deathProb[1]  ? false : true;
             if (myWorld->blobs[i].isAlive == false)
             {
                 killedBlobs++;
             }
             break;
         case GOOD_OLD_BLOB:
-            myWorld->blobs[i].isAlive = (rand() % 10000) < myWorld->params.deathProb[2] * 100.0 ? false : true;
+            myWorld->blobs[i].isAlive = (double)rand() / (double)RAND_MAX < myWorld->params.deathProb[2] ? false : true;
             if (myWorld->blobs[i].isAlive == false)
             {
                 killedBlobs++;
@@ -262,44 +212,6 @@ void blobDeath(World* myWorld)
     }
     myWorld->params.aliveBlobs -= killedBlobs;
 }
-// primero mergeo los baby, despues mergeo los grown, despues me fijo colision de baby con grown SEGUN KAMMAN{
-
-
-/*
-void mergeBabyWithBaby(World* myWorld)
-{
-    int blobsFound = 0;
-    int i = 0;
-    int babyBlobs = 0;
-    while (blobsFound < myWorld->params.aliveBlobs)
-    {
-        while (myWorld->blobs[i].isAlive == false && i < MAX_BLOBS) i++;
-        blobsFound++;
-        if (myWorld->blobs[i].age == BABY_BLOB)
-            babyBlobs++;
-    }
-    i = 0;
-    int babyBlobsFound = 0;
-    while (babyBlobsFound < babyBlobs - 1)   // el ultimo babyBlob ya va a ser evaluado la colision
-    {
-        while (myWorld->blobs[i].isAlive == false && myWorld->blobs[i].age != BABY_BLOB && i < MAX_BLOBS) i++;
-        babyBlobsFound++;
-
-        int k = i + 1;
-        int babyBlobsFound2 = babyBlobsFound;
-        while (babyBlobsFound2 < babyBlobs && myWorld->blobs[i].isAlive == true)
-        {
-            while (myWorld->blobs[k].isAlive == false && myWorld->blobs[k].age != BABY_BLOB && i < MAX_BLOBS) k++;
-            babyBlobsFound2++;
-
-            if (myWorld->blobs[i].isCollision(myWorld->blobs[k]))   /// OJO QUE ES REFERENCIA
-            {
-                babyBlobs -= 1;
-                mergeBlob(myWorld, myWorld->blobs + i, myWorld->blobs + k, myWorld->blobs);
-            }
-        }
-    }
-}*/
 
 
 void growNewBorn(World * myWorld)
@@ -321,7 +233,7 @@ void growNewBorn(World * myWorld)
 void getVertixes(Point& pM, int width, int height, Point* p1, Point* p2, Point* p3, Point* p4)
 {
     p1->x = pM.x - width / 2;          // Allegro sistema de coordenadas
-    p3->x = pM.x - width / 2;          // curva de jordan
+    p3->x = pM.x - width / 2;          
     p2->x = pM.x + width / 2;
     p4->x = pM.x + width / 2;
 
@@ -363,22 +275,6 @@ void transportateBlob(World * myWorld)
         i++;
     }
 }
-//void moveBlobs(World * myWorld)
-//{
-//    int blobsFound = 0;
-//    int i = 0;
-//    while (blobsFound < myWorld->params.aliveBlobs)
-//    {
-//        while (myWorld->blobs[i].isAlive == false) i++;
-//        blobsFound++;
-//
-//        //transportateBlob(myWorld);
-//        myWorld->blobs[i].move(myWorld->params.percentSpeed);  // 1.0 percentSpeed
-//        i++;
-//    }
-//}
-
-
 
 
 
@@ -427,10 +323,52 @@ World* createWorld(Parameters& params) {
         randPos(&posF, world);
         world->f[i].pos = posF;
     }
-
     return world;
     // TODO: terminar
+}
 
+bool inMatrix(World* world, Point& p)	//Checkea si el robot se salio del piso
+{
+    bool onFloor = 0;
+    if (p.x >= 0 && p.x < world->width &&
+        p.y >= 0 && p.y < world->height)
+        onFloor = 1;
+    return onFloor;
+}
+
+
+
+void setFoodCount(World * world)
+{
+    world->f = (Food*)realloc(world->f, world->params.foodCount * sizeof(Food));
+    if (world->f != NULL)
+    {
+        for (int i = 0; i < world->params.foodCount; i++)
+        {
+            if ( !inMatrix(world, world->f[i].pos) )
+            {
+                randPos(&world->f[i].pos, world);
+            }
+        }
+    }
+    else
+    {
+        free(world->f);
+        std::cout << "Unable to reallocate memory" << std::endl;
+    }
+}
+void setSmellRadius(World* world, unsigned int smellRadius)
+{
+    int blobsFound = 0;
+    int i = 0;
+    int killedBlobs = 0;
+    while (blobsFound < world->params.aliveBlobs)
+    {
+        while (world->blobs[i].isAlive == false) i++;
+        blobsFound++;
+        world->blobs[i].smellRadius = smellRadius;
+        i++;
+    }
 }
 
 void deleteWorld(World* myWorld)
@@ -438,20 +376,14 @@ void deleteWorld(World* myWorld)
     free(myWorld->f);
     free(myWorld);
 }
-
-
-// TODO
-/*
-* Detectar pares de colisiones ~ return ColReg * ~ 
-* Funcion para analizar pares de colision: checkColisions(ColReg& reg)
-    - Recibe un arreglo de pares de colision
-    - Llama a una callback por cada arreglo de colision encontrado
-        - la callback se encarga del merge de todos los elementos
-    - Devuelve algo?
-*/
  
 void checkColisions(ColReg& reg, colCallback callback, void *data) {
 
+//DEBUG//////
+
+    World* prueba = (World *)data;
+
+////////////////
     unsigned int* colArr = (unsigned int *)malloc(2 * sizeof(unsigned int));    // Por lo menos voy a ecesitar 2 lugares
     unsigned int* checked = (unsigned int*)malloc(2 * sizeof(unsigned int));
 
@@ -459,8 +391,8 @@ void checkColisions(ColReg& reg, colCallback callback, void *data) {
 
     ColPair* pairs = reg.pairs;
 
-    unsigned int arrSize = 0;
-    unsigned int checkSize = 0;
+    unsigned int arrSize = 0;   // Tamano del arreglo de colisiones actual
+    unsigned int checkSize = 0; // Tamano del arreglo checked
     unsigned int colCount = 0;
 
     unsigned int totalChecks = getDifferentValues(pairs, reg.size);

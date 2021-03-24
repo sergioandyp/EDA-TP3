@@ -38,15 +38,18 @@ static void drawBackground(unsigned int width, unsigned int height);
 static void drawBlobs(Blob blobs[], unsigned int blobCount);
 static void drawFood(Food food[], unsigned int foodCount);
 static Point posToAll(Point pos, unsigned int width, unsigned int height);
+static void drawStats(Parameters& params);
 
-char keys[8][20] = {
+char keys[10][20] = {
 					"mode",
 					"numberOfBlobs",
 					"maxVelBlobs",
 					"%VelBlobs",
 					"smellRadius",
 					"randomJiggleLimit",
-					"deathChance",
+					"deathChance1",
+					"deathChance2",
+					"deathChance3",
 					"foodCount"
 };
 
@@ -99,6 +102,8 @@ void drawWorld(World& world) {
 	drawFood(world.f, world.params.foodCount);
 
 	drawBlobs(world.blobs, world.params.aliveBlobs);
+
+	drawStats(world.params);
 
 	al_flip_display();
 
@@ -256,38 +261,55 @@ static void drawBackground(unsigned int width, unsigned int height) {
 static void drawBlobs(Blob blobs[], unsigned int blobCount) {
 
 	//DEBUG
-	int i = 0;
+	//int i = 0;
 
 	while (blobCount > 0) {
 
 		if (blobs->isAlive) {
 			Point pos = posToAll(blobs->pos, blobs->size, blobs->size);
+			//ALLEGRO_BITMAP* blobBMP = NULL;
 			switch (blobs->age) {
 				case BABY_BLOB:
 				case NEW_BORN:
+					//blobBMP = babyBMP;
 					al_draw_bitmap(babyBMP, pos.x, pos.y, 0);
+					//al_draw_scaled_bitmap(babyBMP, pos.x, pos.y, al_get_bitmap_width(babyBMP),
+					//	al_get_bitmap_height(babyBMP), pos.x, pos.y, blobs->size, blobs->size, 0);		// Imagen escalada
 					//al_draw_circle(blobs->pos.x, blobs->pos.y, blobs->smellRadius, al_color_name("red"), 2.0);
-					al_draw_textf(font40, al_map_rgb(0,0,0), pos.x, pos.y, 0, "%d", i);	// DEBUG
+					//al_draw_textf(font40, al_map_rgb(0,0,0), pos.x, pos.y, 0, "%d", i);	// DEBUG
 					break;
 				case GROWN_BLOB:
+					//blobBMP = grownBMP;
 					al_draw_bitmap(grownBMP, pos.x, pos.y, 0);
+					//al_draw_scaled_bitmap(grownBMP, pos.x, pos.y, al_get_bitmap_width(grownBMP),
+					//	al_get_bitmap_height(grownBMP), pos.x, pos.y, blobs->size, blobs->size, 0);		// Imagen escalada
 					//al_draw_circle(blobs->pos.x, blobs->pos.y, blobs->smellRadius, al_color_name("red"), 2.0);
-					al_draw_textf(font40, al_map_rgb(0,0,0), pos.x, pos.y, 0, "%d", i);	// DEBUG
+					//al_draw_textf(font40, al_map_rgb(0,0,0), pos.x, pos.y, 0, "%d", i);	// DEBUG
 					break;
 				case GOOD_OLD_BLOB:
+					//blobBMP = goodOldBMP;
 					al_draw_bitmap(goodOldBMP, pos.x, pos.y, 0);
 					//al_draw_circle(blobs->pos.x, blobs->pos.y, blobs->smellRadius, al_color_name("red"), 2.0);
-					al_draw_textf(font40, al_map_rgb(0,0,0), pos.x, pos.y, 0, "%d", i);	// DEBUG
+					//al_draw_textf(font40, al_map_rgb(0,0,0), pos.x, pos.y, 0, "%d", i);	// DEBUG
 					break;
 				default:
 					break;
 			}
+
+			//if (blobBMP != NULL) {
+			//	al_draw_scaled_bitmap(blobBMP, pos.x, pos.y, al_get_bitmap_width(blobBMP),
+			//		al_get_bitmap_height(blobBMP), pos.x, pos.y, blobs->size, blobs->size, 0);		// Dibujo imagen escalada
+			//}
+			//else {
+			//	cout << "Error dibujando blob" << endl;
+			//}
+
 			blobCount--;
 		}
 	
 		blobs++;
 		// DEBUG
-		i++;
+		//i++;
 	}
 
 }
@@ -300,6 +322,12 @@ static void drawFood(Food food[], unsigned int foodCount) {
 	}
 
 }
+
+static void drawStats(Parameters& params) {
+	al_draw_textf(font20, al_map_rgb(0,0,0), 0, 0, 0, "Speed: %.2f%%  Food: %d  RJL: %.2f  Smell: %d  Death: [%.2f, %.2f, %.2f]",
+	params.percentSpeed*100.0, params.foodCount, params.randomJiggleLimit, params.smellRadius, params.deathProb[0], params.deathProb[1], params.deathProb[2]);
+}
+
 
 // Dado una posicion del centro de un objeto, la transorma en
 // coordenadas a la esquina superior izquierda para imprimir en Allegro
@@ -362,12 +390,12 @@ int parseCallback(char* key, char* value, Parameters* params) {//0 si no es vali
                 return NOPARAM;
             }
             else {
-				for (i = 0; i <= 7; i++)
+				for (i = 0; i <= 9; i++)
 				{
 					if (strcmp(keys[i], key) == 0)
 						break;
 				}
-				if (i == 8)
+				if (i == 10)
 					return NOPARAM;
 				switch (i)
 				{
@@ -401,7 +429,7 @@ int parseCallback(char* key, char* value, Parameters* params) {//0 si no es vali
 					case 3:
 						if (value[0] >= '0' && value[0] <= '9')
 						{
-							params->percentSpeed = atoi(value); // o sino strtod (value)
+							params->percentSpeed = strtod(value,NULL); // o sino atoi (value) /100
 						}
 						else
 							return NOPARAM;
@@ -426,12 +454,24 @@ int parseCallback(char* key, char* value, Parameters* params) {//0 si no es vali
 						if (value[0] >= '0' && value[0] <= '9')
 						{
 							params->deathProb[0] = strtod(value,NULL);
-							params->deathProb[1] = strtod(value, NULL);
-							params->deathProb[2] = strtod(value, NULL);
 						}
 							return NOPARAM;
 						break;
 					case 7:
+						if (value[0] >= '0' && value[0] <= '9')
+						{
+							params->deathProb[1] = strtod(value, NULL);
+						}
+							return NOPARAM;
+						break;
+					case 8:
+						if (value[0] >= '0' && value[0] <= '9')
+						{
+							params->deathProb[2] = strtod(value, NULL);
+						}
+							return NOPARAM;
+						break;
+					case 9:
 						if (value[0] >= '0' && value[0] <= '9')
 						{
 							params->foodCount = atoi(value);
@@ -520,27 +560,23 @@ int keyboardChanges(bool estado, int tecla) {
 	return salida;
 }
 
-void checkEvents()
+void checkEvents(bool& redraw, bool& display_close)
 {
-	ALLEGRO_EVENT evento;
-	int do_exit = 0;
+	ALLEGRO_EVENT event;
 
-	al_wait_for_event(eventQueue, &evento); //Espera que ocurra un evento
-
-	switch (evento.type) {                    //Se evalua el evento ocurrido y se actua acordemente
+	if (al_get_next_event(eventQueue, &event))
+	{
+		switch (event.type) {                    //Se evalua el evento ocurrido y se actua acordemente
 		case ALLEGRO_EVENT_DISPLAY_CLOSE:
-			do_exit = 1;
+			display_close = true;
 			break;
 
 		case ALLEGRO_EVENT_KEY_DOWN:
-			keyboardChanges(PRESSED, evento.keyboard.keycode);
+			keyboardChanges(PRESSED, event.keyboard.keycode);
 			break;
 
 		case ALLEGRO_EVENT_KEY_UP:
-			keyboardChanges(NOPRESSED, evento.keyboard.keycode);
-			break;
-
-		case ALLEGRO_EVENT_TIMER:
+			keyboardChanges(NOPRESSED, event.keyboard.keycode);
 			break;
 
 		case ALLEGRO_EVENT_MOUSE_BUTTON_DOWN:
@@ -548,5 +584,11 @@ void checkEvents()
 
 		case ALLEGRO_EVENT_MOUSE_BUTTON_UP:
 			break;
+
+		case ALLEGRO_EVENT_TIMER:
+			redraw = true;
+			break;
+
+		}
 	}
 }

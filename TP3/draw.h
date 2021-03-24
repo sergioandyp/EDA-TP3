@@ -14,7 +14,7 @@ void drawWorld(World& world);
 
 int keyboardChanges(bool estado, int tecla);
 
-void checkEvents();
+void checkEvents(bool& redraw, bool& display_close);
 
 int parseCmdLine(int argc, char* argv[], Parameters* params, int(*pCallback) (char*, char*,Parameters*));
 
