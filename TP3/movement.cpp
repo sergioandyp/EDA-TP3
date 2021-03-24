@@ -14,6 +14,8 @@ void getVertixes(Point& pM, int width, int height, Point* p1, Point* p2, Point* 
 double averageDirection(unsigned int* colarr, unsigned int size, Blob arr[], unsigned int extra);
 unsigned int getDifferentValues(ColPair arr[], unsigned int size);
 
+double averageSpeed(unsigned int* colArr, unsigned int size, World* myWorld);
+
 void createBirth(World* myWorld, int indexBlob);
 
 
@@ -598,6 +600,9 @@ ColReg* detectPairs(World * myWorld, etaryGroupType Age)
 //    }
 //}
 
+
+
+
 void mergeBlobs (unsigned int* colArr, unsigned int size, void * var )
 {
     World * myWorld = (World*)var;
@@ -621,7 +626,7 @@ void mergeBlobs (unsigned int* colArr, unsigned int size, void * var )
         myWorld->blobs[i].pos = p;
         myWorld->blobs[i].angle = averageDirection(colArr, size, myWorld->blobs, myWorld->params.randomJiggleLimit);
         
-        myWorld->blobs[i].vel = 5;
+        myWorld->blobs[i].vel = averageSpeed(colArr, size, myWorld);
         myWorld->blobs[i].foodCount = 0;
         myWorld->blobs[i].smellRadius = myWorld->params.smellRadius;
         myWorld->blobs[i].isAlive = true;
@@ -640,6 +645,23 @@ void mergeBlobs (unsigned int* colArr, unsigned int size, void * var )
         myWorld->params.aliveBlobs -= (size - 1);
     }
 }
+
+double averageSpeed(unsigned int* colArr, unsigned int size, World * myWorld)
+{
+    double averageSpeed = 0;
+    for (int i = 0; i < size; i++)
+    {
+        averageSpeed += myWorld->blobs[colArr[i]].vel;
+    }
+    averageSpeed /= size;
+    if (averageSpeed == 0)
+    {
+        averageSpeed = myWorld->blobs[colArr[0]].vel;
+    }
+    return averageSpeed;
+}
+
+
 
 void averagePosition(unsigned int *colarr, unsigned int size, Blob arr[], Point * mypoint)
 {
