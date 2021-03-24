@@ -6,18 +6,25 @@
 #include "World.h"
 
 // Prototipos funciones privadas:
-void averagePosition(unsigned int* colarr, unsigned int size, Blob arr[], Point* mypoint);
-void getCollisionOnFood(Blob* myBlob, Food* myFood, World* MyWorld);
 
+//Calcula la posicion promedio para el caso de mergeo de blob y creacion de uno nuevo
+void averagePosition(unsigned int* colarr, unsigned int size, Blob arr[], Point* mypoint);
+//Se fija si un blob colisiona con un alimento
+void getCollisionOnFood(Blob* myBlob, Food* myFood, World* MyWorld);
+//Calcula una posicion random dentro del mapa
 void randPos(Point* myPoint, World* myWorld);
 void getVertixes(Point& pM, int width, int height, Point* p1, Point* p2, Point* p3, Point* p4);
+//Direccion promedio de los blobs participes del mergeo
 double averageDirection(unsigned int* colarr, unsigned int size, Blob arr[], unsigned int extra);
+
 unsigned int getDifferentValues(ColPair arr[], unsigned int size);
 
 double averageSpeed(unsigned int* colArr, unsigned int size, World* myWorld);
 
-void createBirth(World* myWorld, int indexBlob);
 
+// Crea un blob, debido a que un blob comio el alimento suficiente
+void createBirth(World* myWorld, int indexBlob);
+bool inMatrix(World* world, Point& p);
 
 
 template <typename T> bool isInArray(T elem, T arr[], unsigned int size) {
@@ -65,7 +72,7 @@ void BlobsFoodAction(World* myWorld)
                         flag++;
                         shortestDistance = distance;
                         myWorld->blobs[i].angle = getAngleBetweenPoints(myWorld->blobs[i].pos, myWorld->f[j].pos);
-                        getCollisionOnFood(&myWorld->blobs[i], &myWorld->f[j], myWorld);   // !!!!!!! ATENCION !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!1
+                        getCollisionOnFood(&myWorld->blobs[i], &myWorld->f[j], myWorld);   
                     }
                     else if (distance < shortestDistance)
                     {
@@ -74,6 +81,11 @@ void BlobsFoodAction(World* myWorld)
                         getCollisionOnFood(&myWorld->blobs[i], &myWorld->f[j], myWorld);
                     }
                 }
+                else
+                {
+                    getCollisionOnFood(&myWorld->blobs[i], &myWorld->f[j], myWorld);
+                }
+
             }
             i++;
         }
@@ -222,7 +234,7 @@ void growNewBorn(World * myWorld)
     {
         while (myWorld->blobs[i].isAlive == false) i++;
         blobsFound++;
-        if (myWorld->blobs[i].age == NEW_BORN && myWorld->blobs[i].ticksAlive > 120)
+        if (myWorld->blobs[i].age == NEW_BORN && myWorld->blobs[i].ticksAlive > 10)
             myWorld->blobs[i].age = BABY_BLOB;
         else
             myWorld->blobs[i].ticksAlive++;
@@ -307,7 +319,7 @@ World* createWorld(Parameters& params) {
     for (int i = 0; i < MAX_BLOBS; i++) {       // Inicializo todos los blobs con su propia velocidad y posicion
         world->blobs[i] = blob;
         world->blobs[i].isAlive = i < params.aliveBlobs;
-        world->blobs[i].vel = world->params.mode ? world->params.maxSpeed : rand() * (world->params.maxSpeed / RAND_MAX);
+        world->blobs[i].vel = world->params.mode == MODE_1 ? world->params.maxSpeed : rand() * (world->params.maxSpeed / RAND_MAX);
         world->blobs[i].angle = rand()*(360.0/RAND_MAX);
         randPos(&(world->blobs[i].pos), world);
     }
@@ -324,7 +336,6 @@ World* createWorld(Parameters& params) {
         world->f[i].pos = posF;
     }
     return world;
-    // TODO: terminar
 }
 
 bool inMatrix(World* world, Point& p)	//Checkea si el robot se salio del piso
@@ -345,10 +356,11 @@ void setFoodCount(World * world)
     {
         for (int i = 0; i < world->params.foodCount; i++)
         {
-            if ( !inMatrix(world, world->f[i].pos) )
+            if ( inMatrix(world, world->f[i].pos) == false )
             {
                 randPos(&world->f[i].pos, world);
             }
+            world->f[i].size = world->sizes.foodSize;
         }
     }
     else
@@ -357,11 +369,14 @@ void setFoodCount(World * world)
         std::cout << "Unable to reallocate memory" << std::endl;
     }
 }
-void setSmellRadius(World* world, unsigned int smellRadius)
+void setSmellRadius(World* world, int smellRadius)
 {
+    if (smellRadius < 0 )
+    {
+        smellRadius = 0;
+    }
     int blobsFound = 0;
     int i = 0;
-    int killedBlobs = 0;
     while (blobsFound < world->params.aliveBlobs)
     {
         while (world->blobs[i].isAlive == false) i++;
@@ -369,6 +384,7 @@ void setSmellRadius(World* world, unsigned int smellRadius)
         world->blobs[i].smellRadius = smellRadius;
         i++;
     }
+    world->params.smellRadius = smellRadius;
 }
 
 void deleteWorld(World* myWorld)
@@ -411,7 +427,7 @@ void checkColisions(ColReg& reg, colCallback callback, void *data) {
             checkSize = 2;
         } else {
             int i = 0;
-            while (!isInArray(pairs[++i][0], checked, checkSize));       // Hay al menos un par que no vi
+            while (isInArray(pairs[++i][0], checked, checkSize));       // Hay al menos un par que no vi
 
             // El par pairs[i] no esta chequeado todavia:
 
@@ -509,30 +525,6 @@ ColReg* detectPairs(World * myWorld, etaryGroupType Age)
     }
     return myRegister;
 }
-
-
-//void mergeBlob(World* myWorld, Blob* b1, Blob* b2, Blob arr[])
-//{
-//    int i = 0;
-//    while (arr[i].isAlive == true && i < MAX_BLOBS) i++;
-//    if (i != MAX_BLOBS)
-//    {
-//        if (b1->age == BABY_BLOB)
-//            arr[i].age = GROWN_BLOB;
-//        else if (b1->age == GROWN_BLOB)
-//            arr[i].age = GOOD_OLD_BLOB;
-//
-//        arr[i].angle = averageDirection(b1->angle, b2->angle) + rand() % myWorld->params.randomJiggleLimit;
-//        arr[i].pos = b1->pos;
-//        Point p1 = translatePoint(b1->pos, distanceB2Points(b1->pos, b2->pos) / 2.0, getAngleBetweenPoints(b1->pos, b2->pos));
-//        arr[i].moveOffset(p1); // OJO LOS ANGULOS 
-//        // destruyo los b1 y b2
-//        b1->isAlive = false;
-//        b2->isAlive = false;
-//    }
-//}
-
-
 
 
 void mergeBlobs (unsigned int* colArr, unsigned int size, void * var )
@@ -635,8 +627,6 @@ double averageDirection(unsigned int* colarr, unsigned int size, Blob arr[], uns
     else
     {
         angle = atan(ejex / ejey) * 180.0 / PI;
-        //printf("atan = %f\n", (float)atan(ejey / ejex));
-        //printf("angle = %f\n", angle);
 
         if (ejey >= 0 && ejex >= 0)
             angle = angle;
@@ -653,7 +643,6 @@ double averageDirection(unsigned int* colarr, unsigned int size, Blob arr[], uns
     if (angle >= 360)
         angle = angle - 360;
 
-    //printf("angle = %f\n", angle);
     return angle;
 }
 

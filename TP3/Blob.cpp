@@ -9,7 +9,7 @@ void Blob::moveOffset(Point& offSet) {
 	this->pos.y += offSet.y;
 }
 
-void Blob::move(unsigned int percentSpeed)
+void Blob::move(double percentSpeed)
 {
 	this->pos = translatePoint(this->pos, this->vel * percentSpeed, this->angle);
 }

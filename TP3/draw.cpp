@@ -1,4 +1,5 @@
 #include "draw.h"
+#include "movement.h"
 
 #include <allegro5/allegro.h>
 #include <allegro5/allegro_image.h>
@@ -19,11 +20,13 @@ using namespace std;
 #define GOOD_OLD_IMG	"goodoldblob.png"
 #define FOOD_IMG		"food.png"
 #define FONT			"OpenSans-Semibold.ttf"
-#define ERROR			-1
-#define NOPARAM			0
-#define OK				1
+
+
+#define MIN_PROB	0.0001
+
 
 // punteros a elementos de allegro
+static ALLEGRO_TIMER* timer;
 static ALLEGRO_DISPLAY* display;
 static ALLEGRO_EVENT_QUEUE* eventQueue;
 static ALLEGRO_BITMAP* babyBMP;
@@ -39,19 +42,6 @@ static void drawBlobs(Blob blobs[], unsigned int blobCount);
 static void drawFood(Food food[], unsigned int foodCount);
 static Point posToAll(Point pos, unsigned int width, unsigned int height);
 static void drawStats(Parameters& params);
-
-char keys[10][20] = {
-					"mode",
-					"numberOfBlobs",
-					"maxVelBlobs",
-					"%VelBlobs",
-					"smellRadius",
-					"randomJiggleLimit",
-					"deathChance1",
-					"deathChance2",
-					"deathChance3",
-					"foodCount"
-};
 
 
 //#define TEST
@@ -143,6 +133,16 @@ int initWorld(World& world)
 										display = al_create_display(world.width, world.height);
 										if (display)
 										{
+											timer = al_create_timer(1.0 / FPS); //Crea el timer pero NO empieza a correr
+											if (timer) 
+											{
+												
+											}
+											else
+											{
+												fprintf(stderr, "failed to create timer!\n");
+												error = 5;
+											}
 
 										}
 										else
@@ -209,6 +209,9 @@ int initWorld(World& world)
 	{
 		al_register_event_source(eventQueue, al_get_display_event_source(display));
 		al_register_event_source(eventQueue, al_get_keyboard_event_source());
+		al_register_event_source(eventQueue, al_get_timer_event_source(timer));
+		
+		al_start_timer(timer);
 	}
 	else
 	{
@@ -260,56 +263,29 @@ static void drawBackground(unsigned int width, unsigned int height) {
 
 static void drawBlobs(Blob blobs[], unsigned int blobCount) {
 
-	//DEBUG
-	//int i = 0;
-
 	while (blobCount > 0) {
 
 		if (blobs->isAlive) {
 			Point pos = posToAll(blobs->pos, blobs->size, blobs->size);
-			//ALLEGRO_BITMAP* blobBMP = NULL;
 			switch (blobs->age) {
 				case BABY_BLOB:
 				case NEW_BORN:
-					//blobBMP = babyBMP;
 					al_draw_bitmap(babyBMP, pos.x, pos.y, 0);
-					//al_draw_scaled_bitmap(babyBMP, pos.x, pos.y, al_get_bitmap_width(babyBMP),
-					//	al_get_bitmap_height(babyBMP), pos.x, pos.y, blobs->size, blobs->size, 0);		// Imagen escalada
-					//al_draw_circle(blobs->pos.x, blobs->pos.y, blobs->smellRadius, al_color_name("red"), 2.0);
-					//al_draw_textf(font40, al_map_rgb(0,0,0), pos.x, pos.y, 0, "%d", i);	// DEBUG
 					break;
 				case GROWN_BLOB:
-					//blobBMP = grownBMP;
 					al_draw_bitmap(grownBMP, pos.x, pos.y, 0);
-					//al_draw_scaled_bitmap(grownBMP, pos.x, pos.y, al_get_bitmap_width(grownBMP),
-					//	al_get_bitmap_height(grownBMP), pos.x, pos.y, blobs->size, blobs->size, 0);		// Imagen escalada
-					//al_draw_circle(blobs->pos.x, blobs->pos.y, blobs->smellRadius, al_color_name("red"), 2.0);
-					//al_draw_textf(font40, al_map_rgb(0,0,0), pos.x, pos.y, 0, "%d", i);	// DEBUG
 					break;
 				case GOOD_OLD_BLOB:
-					//blobBMP = goodOldBMP;
 					al_draw_bitmap(goodOldBMP, pos.x, pos.y, 0);
-					//al_draw_circle(blobs->pos.x, blobs->pos.y, blobs->smellRadius, al_color_name("red"), 2.0);
-					//al_draw_textf(font40, al_map_rgb(0,0,0), pos.x, pos.y, 0, "%d", i);	// DEBUG
 					break;
 				default:
 					break;
 			}
 
-			//if (blobBMP != NULL) {
-			//	al_draw_scaled_bitmap(blobBMP, pos.x, pos.y, al_get_bitmap_width(blobBMP),
-			//		al_get_bitmap_height(blobBMP), pos.x, pos.y, blobs->size, blobs->size, 0);		// Dibujo imagen escalada
-			//}
-			//else {
-			//	cout << "Error dibujando blob" << endl;
-			//}
-
 			blobCount--;
 		}
 	
 		blobs++;
-		// DEBUG
-		//i++;
 	}
 
 }
@@ -324,8 +300,11 @@ static void drawFood(Food food[], unsigned int foodCount) {
 }
 
 static void drawStats(Parameters& params) {
-	al_draw_textf(font20, al_map_rgb(0,0,0), 0, 0, 0, "Speed: %.2f%%  Food: %d  RJL: %.2f  Smell: %d  Death: [%.2f, %.2f, %.2f]",
-	params.percentSpeed*100.0, params.foodCount, params.randomJiggleLimit, params.smellRadius, params.deathProb[0], params.deathProb[1], params.deathProb[2]);
+	al_draw_textf(font20, al_map_rgb(0, 0, 0), 0, 0, 0, "Speed: %.2f%%", params.percentSpeed * 100.0);		//Asi separado porque tod junto se rompe
+	al_draw_textf(font20, al_map_rgb(0, 0, 0), 0, 20, 0, "Food: %d", params.foodCount);
+	al_draw_textf(font20, al_map_rgb(0, 0, 0), 0, 40, 0, "Smell: %d", params.smellRadius);
+	al_draw_textf(font20, al_map_rgb(0, 0, 0), 0, 60, 0, "RJL: %d", params.randomJiggleLimit);
+	al_draw_textf(font20, al_map_rgb(0, 0, 0), 0, 80, 0, "Death: [%.2f%%, %.2f%%, %.2f%%]", params.deathProb[0]*100.0, params.deathProb[1]*100.0, params.deathProb[2]*100.0);
 }
 
 
@@ -337,230 +316,94 @@ static Point posToAll(Point pos, unsigned int width, unsigned int height) {
 	pos.y -= height/2.0;
 
 	return pos;
-
 }
 
-int parseCmdLine(int argc, char* argv[], Parameters* params, int(*pCallback) (char*, char*, Parameters*)) {//cant de opciones +params o -1 en error
-    int i = 1;//la primer palabra,con indice 0, es el nombre del programa, y esta no se cuenta
-    int datos = 0;//params+opciones
-    for (i = 1; i < argc; ++i) {
-        if (argv[i][0] == '-') {//si hay opcion
-            if (i != (argc - 1)) {//si no es el ultimo elemento que recibe
-                if (argv[i][1] == '\0') {//si es una clave sin valor
-                    return ERROR;
-                }
-                else {
-                    if (pCallback(argv[i]+1, argv[i + 1], params) == 1) {//si esta todo bien..
-                        ++datos;
-                        ++i;//salteo el valor de la clave
-                    }
-                    else {//parsecallback tiro error
-                        return ERROR;
-                    }
-                }
-            }
-            else {
-                return ERROR;
-            }
-        }
-        else {//encontre un parametro
-            if (pCallback(NULL, argv[i], params) == 1) {//si esta todo bien
-                ++datos;
-            }
-            else {//parsecallback tiro error
-                return ERROR;
-            }
-        }
-    }
-    return datos;
-}
-////////////////////////////////////////////////////////////
-int parseCallback(char* key, char* value, Parameters* params) {//0 si no es valido 1 si si
-	int i = 0;
-    if (key == NULL) {//es un parametro
-		
-        return NOPARAM;
-    }
-    else {//es una opcion
-        if (key[1] == NULL) {//clave vacia devuelve error
-            return NOPARAM;
-        }
-        else {
-            if (value == NULL) {//si el valor es null es una clave sin valor y devuelve error
-                return NOPARAM;
-            }
-            else {
-				for (i = 0; i <= 9; i++)
-				{
-					if (strcmp(keys[i], key) == 0)
-						break;
-				}
-				if (i == 10)
-					return NOPARAM;
-				switch (i)
-				{
-					case 0:
-						if (value[0] == '1')
-							params->mode = 1;
-						else
-						{
-							if (value[0] == '2')
-								params->mode = 2;
-							else
-								return NOPARAM;
-						}
-						break;
-					case 1:
-						if (value[0] >= '1' && value[0] <= '9')
-						{
-							params->aliveBlobs = atoi(value);
-						}
-						else
-							return NOPARAM;
-						break;
-					case 2:
-						if (value[0] >= '0' && value[0] <= '9')
-						{
-							params->maxSpeed = atoi(value); // o sino strtod (value)
-						}
-						else
-							return NOPARAM;
-						break;
-					case 3:
-						if (value[0] >= '0' && value[0] <= '9')
-						{
-							params->percentSpeed = strtod(value,NULL); // o sino atoi (value) /100
-						}
-						else
-							return NOPARAM;
-						break;
-					case 4:
-						if (value[0] >= '0' && value[0] <= '9')
-						{
-							params->smellRadius = atoi(value); // o sino strtod (value)
-						}
-						else
-							return NOPARAM;
-						break;
-					case 5:
-						if (value[0] >= '0' && value[0] <= '9' && atoi(value) <= 360)
-						{
-							params->randomJiggleLimit = atoi(value);
-						}
-						else
-							return NOPARAM;
-						break;
-					case 6:
-						if (value[0] >= '0' && value[0] <= '9')
-						{
-							params->deathProb[0] = strtod(value,NULL);
-						}
-							return NOPARAM;
-						break;
-					case 7:
-						if (value[0] >= '0' && value[0] <= '9')
-						{
-							params->deathProb[1] = strtod(value, NULL);
-						}
-							return NOPARAM;
-						break;
-					case 8:
-						if (value[0] >= '0' && value[0] <= '9')
-						{
-							params->deathProb[2] = strtod(value, NULL);
-						}
-							return NOPARAM;
-						break;
-					case 9:
-						if (value[0] >= '0' && value[0] <= '9')
-						{
-							params->foodCount = atoi(value);
-						}
-						else
-							return NOPARAM;
-						break;
-				}
-
-                return OK;
-            }
-        }
-         
-    }
-}
-
-#include "Events.h"
-
-int keyboardChanges(bool estado, int tecla) {
+int keyboardChanges(bool estado, int tecla, World* myWorld) {
 
 	int salida = 0;
 
 	if (estado == PRESSED) { // if analizando si la tecla fue presionada
+	
 		switch (tecla) {
-		case ALLEGRO_KEY_0: 
-
+		case ALLEGRO_KEY_LEFT: 
+			if(myWorld->params.percentSpeed >= 0.1)
+				myWorld->params.percentSpeed = myWorld->params.percentSpeed - 0.1;
 			break;
 
-		case ALLEGRO_KEY_1: 
+		case ALLEGRO_KEY_RIGHT:
+			if (myWorld->params.percentSpeed <= 0.9)
+				myWorld->params.percentSpeed = myWorld->params.percentSpeed + 0.1;
+			break;
 
+		case ALLEGRO_KEY_DOWN: 
+			if (myWorld->params.randomJiggleLimit >= 10)
+				myWorld->params.randomJiggleLimit = myWorld->params.randomJiggleLimit - 10;
+			break;
+
+		case ALLEGRO_KEY_UP: 
+			if(myWorld->params.randomJiggleLimit <=349)
+				myWorld->params.randomJiggleLimit = myWorld->params.randomJiggleLimit + 10;
+			break;
+
+		case ALLEGRO_KEY_W: 
+			setSmellRadius(myWorld, myWorld->params.smellRadius + 10);
+			break;
+
+		case ALLEGRO_KEY_S:
+			if(myWorld->params.smellRadius >= 10)
+				setSmellRadius(myWorld, myWorld->params.smellRadius - 10);
+			else
+				setSmellRadius(myWorld, 0);
+			break;
+
+		case ALLEGRO_KEY_A:
+			if (myWorld->params.foodCount >= 1)
+			{
+				myWorld->params.foodCount = myWorld->params.foodCount - 1;
+				setFoodCount(myWorld);
+			}
+			break;
+
+		case ALLEGRO_KEY_D: 
+			myWorld->params.foodCount = myWorld->params.foodCount + 1;
+			setFoodCount(myWorld);
+			break;
+
+				case ALLEGRO_KEY_1:
+			if (myWorld->params.deathProb[0] >= MIN_PROB)
+				myWorld->params.deathProb[0] = myWorld->params.deathProb[0] - MIN_PROB;
 			break;
 
 		case ALLEGRO_KEY_2: 
-
+			if (myWorld->params.deathProb[0] <= 1-MIN_PROB)
+				myWorld->params.deathProb[0] = myWorld->params.deathProb[0] + MIN_PROB;
 			break;
 
 		case ALLEGRO_KEY_3: 
-
+			if (myWorld->params.deathProb[1] >= MIN_PROB)
+				myWorld->params.deathProb[1] = myWorld->params.deathProb[1] - MIN_PROB;
 			break;
 
 		case ALLEGRO_KEY_4: 
-
+			if (myWorld->params.deathProb[1] <= 1-MIN_PROB)
+				myWorld->params.deathProb[1] = myWorld->params.deathProb[1] + MIN_PROB;
 			break;
 
 		case ALLEGRO_KEY_5: 
-
+			if (myWorld->params.deathProb[2] >= MIN_PROB)
+				myWorld->params.deathProb[2] = myWorld->params.deathProb[2] - MIN_PROB;
 			break;
 
 		case ALLEGRO_KEY_6: 
-
-			break;
-
-		case ALLEGRO_KEY_7: 
-
-			break;
-
-		case ALLEGRO_KEY_Q: 
-
-			break;
-
-		case ALLEGRO_KEY_E: 
-
-			break;
-
-		case ALLEGRO_KEY_P: 
-
-			break;
-
-		case ALLEGRO_KEY_C: 
-
-			break;
-
-		case ALLEGRO_KEY_I: 
-
-			break;
-
-		case ALLEGRO_KEY_A: 
-
-			break;
-
-		case ALLEGRO_KEY_B: 
-
+			if (myWorld->params.deathProb[2] <= 1-MIN_PROB)
+				myWorld->params.deathProb[2] = myWorld->params.deathProb[2] + MIN_PROB;
 			break;
 		}
 	}
 	return salida;
 }
 
-void checkEvents(bool& redraw, bool& display_close)
+void* checkEvents(bool& redraw, bool& display_close, World* myWorld)
 {
 	ALLEGRO_EVENT event;
 
@@ -572,11 +415,11 @@ void checkEvents(bool& redraw, bool& display_close)
 			break;
 
 		case ALLEGRO_EVENT_KEY_DOWN:
-			keyboardChanges(PRESSED, event.keyboard.keycode);
+			keyboardChanges(PRESSED, event.keyboard.keycode, myWorld);
 			break;
 
 		case ALLEGRO_EVENT_KEY_UP:
-			keyboardChanges(NOPRESSED, event.keyboard.keycode);
+			keyboardChanges(NOPRESSED, event.keyboard.keycode, myWorld);
 			break;
 
 		case ALLEGRO_EVENT_MOUSE_BUTTON_DOWN:
@@ -591,4 +434,5 @@ void checkEvents(bool& redraw, bool& display_close)
 
 		}
 	}
+	return eventQueue;
 }

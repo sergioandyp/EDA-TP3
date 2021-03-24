@@ -56,4 +56,9 @@ void makeBlobBirth(World* myWorld);
 
 void blobDeath(World* myWorld);
 
+void setFoodCount(World* world);
+
+void setSmellRadius(World* world, int smellRadius);
+
+
 #endif

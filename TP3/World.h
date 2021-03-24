@@ -9,12 +9,15 @@ enum {MODE_1, MODE_2};
 
 class Parameters {
 public:
+	Parameters(unsigned int randomJiggleLimit = 360, unsigned int aliveBlobs = 1, unsigned int foodCount = 1, double maxSpeed = 10.0, double percentSpeed = 1.0,
+		unsigned int smellRadius = 100, bool mode = MODE_1 );
+
 	unsigned int foodCount;
 	unsigned int randomJiggleLimit;
 	double deathProb[3];
 	double percentSpeed;		// Velocidad relativa de los Blobs
 	double maxSpeed;			// Velocidad maxima de los Blobs
-	double smellRadius;
+	unsigned int smellRadius;
 	unsigned int aliveBlobs;	// Cantidad de blobs actualmente vivos
 	bool mode;					// 0 para modo 1, 1 para modo 2
 };

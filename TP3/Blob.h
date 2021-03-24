@@ -19,11 +19,8 @@ public:
 	etaryGroupType age;
 	unsigned foodCount;
 	bool isAlive;
-
-	//void move(Point& newPos);
-	void move(unsigned int percentSpeed);
+	void move(double percentSpeed);
 	void moveOffset(Point& offset);
-	//void merge(Blob* blobToMerge);
 	void feed();
 	bool isCollision(Blob& blob2);
 };

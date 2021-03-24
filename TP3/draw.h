@@ -3,6 +3,7 @@
 
 #define PRESSED 1
 #define NOPRESSED 0
+#define FPS 40
 
 #include "World.h"
 
@@ -12,12 +13,9 @@ void destroyWorld(int error = 4);
 
 void drawWorld(World& world);
 
-int keyboardChanges(bool estado, int tecla);
+int keyboardChanges(bool estado, int tecla, World* myWorld);
 
-void checkEvents(bool& redraw, bool& display_close);
+void* checkEvents(bool& redraw, bool& display_close, World* myWorld);
 
-int parseCmdLine(int argc, char* argv[], Parameters* params, int(*pCallback) (char*, char*,Parameters*));
-
-int parseCallback(char* key, char* value, Parameters* params);
 
 #endif
