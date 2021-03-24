@@ -393,7 +393,7 @@ int parseCallback(char* key, char* value, Parameters* params) {//0 si no es vali
 					case 2:
 						if (value[0] >= '0' && value[0] <= '9')
 						{
-							params->maxSpeed = atoi(value);
+							params->maxSpeed = atoi(value); // o sino strtod (value)
 						}
 						else
 							return NOPARAM;
@@ -401,7 +401,7 @@ int parseCallback(char* key, char* value, Parameters* params) {//0 si no es vali
 					case 3:
 						if (value[0] >= '0' && value[0] <= '9')
 						{
-							params->percentSpeed = atoi(value);
+							params->percentSpeed = atoi(value); // o sino strtod (value)
 						}
 						else
 							return NOPARAM;
@@ -409,21 +409,26 @@ int parseCallback(char* key, char* value, Parameters* params) {//0 si no es vali
 					case 4:
 						if (value[0] >= '0' && value[0] <= '9')
 						{
-							params->smellRadius = atoi(value);
+							params->smellRadius = atoi(value); // o sino strtod (value)
 						}
 						else
 							return NOPARAM;
 						break;
 					case 5:
-						if (value[0] >= '1' && value[0] <= '9')
+						if (value[0] >= '0' && value[0] <= '9' && atoi(value) <= 360)
 						{
-							if(atoi(value) <= 360)
-								params->aliveBlobs = atoi(value);
+							params->randomJiggleLimit = atoi(value);
 						}
 						else
 							return NOPARAM;
 						break;
 					case 6:
+						if (value[0] >= '0' && value[0] <= '9')
+						{
+							params->deathProb[0] = strtod(value,NULL);
+							params->deathProb[1] = strtod(value, NULL);
+							params->deathProb[2] = strtod(value, NULL);
+						}
 							return NOPARAM;
 						break;
 					case 7:

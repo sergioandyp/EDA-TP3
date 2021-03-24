@@ -11,7 +11,7 @@ void getCollisionOnFood(Blob* myBlob, Food* myFood, World* MyWorld);
 void blobBirth(World* myWorld, Blob& padre);
 void randPos(Point* myPoint, World* myWorld);
 void getVertixes(Point& pM, int width, int height, Point* p1, Point* p2, Point* p3, Point* p4);
-double averageDirection(void);
+double averageDirection(unsigned int* colarr, unsigned int size, Blob arr[], unsigned int extra);
 unsigned int getDifferentValues(ColPair arr[], unsigned int size);
 
 void createBirth(World* myWorld, int indexBlob);
@@ -619,7 +619,7 @@ void mergeBlobs (unsigned int* colArr, unsigned int size, void * var )
         Point p = { 0, 0 };
         averagePosition(colArr, size, myWorld->blobs, &p);
         myWorld->blobs[i].pos = p;
-        myWorld->blobs[i].angle = averageDirection();
+        myWorld->blobs[i].angle = averageDirection(colArr, size, myWorld->blobs, myWorld->params.randomJiggleLimit);
         
         myWorld->blobs[i].vel = 5;
         myWorld->blobs[i].foodCount = 0;
@@ -652,20 +652,55 @@ void averagePosition(unsigned int *colarr, unsigned int size, Blob arr[], Point 
     mypoint->y /= size;
 }
 
-
-double averageDirection(void)
+double averageDirection(unsigned int* colarr, unsigned int size, Blob arr[], unsigned int extra)
 {
-    /*Point a, b;
-    a.x = sin(angle1 * PI / 180.0);
-    a.y = cos(angle1 * PI / 180.0);          // TODO
+    double angle = 0;
+    float ejex = 0, ejey = 0;
+    printf("extra = %i\n", extra);
+    for (int i = 0; i < size; i++)
+    {
+        ejey += cos((arr[colarr[i]].angle)* PI /180);
+        ejex += sin((arr[colarr[i]].angle)* PI /180);
+        printf("angle inicial = %i\n", arr[colarr[i]].angle);
+    }
 
-    b.x = sin(angle2 * PI / 180.0);
-    b.y = cos(angle2 * PI / 180.0);
+    if (ejex == 0)
+    {
+        if (ejey > 0)
+            angle = 0;
+        else
+            angle = 180;
+    }
+    else if (ejey == 0)
+    {
+        if (ejex > 90)
+            angle = 0;
+        else
+            angle = 270;
+    }
+    else
+    {
+        angle = atan(ejex / ejey) * 180.0 / PI;
+        //printf("atan = %f\n", (float)atan(ejey / ejex));
+        //printf("angle = %f\n", angle);
 
-    double averageAngle = atan2(a.x + b.x, a.y + b.y) * 180.0 / PI;  // OJO ATAN2
+        if (ejey >= 0 && ejex >= 0)
+            angle = angle;
+        if (ejey < 0 && ejex >= 0)
+            angle = angle + (double)180;
+        if (ejey < 0 && ejex < 0)
+            angle = angle + (double)180;
+        if (ejey >= 0 && ejex < 0)
+            angle = angle + (double)360;
+    }
 
-    return averageAngle;*/
-    return rand() % 360;                     
+    angle = angle + extra;
+
+    if (angle >= 360)
+        angle = angle - 360;
+
+    //printf("angle = %f\n", angle);
+    return angle;
 }
 
 void moveBlobs(World& world) {
