@@ -466,8 +466,6 @@ void checkColisions(ColReg& reg, colCallback callback, void *data) {
             }
         }
 
-        // REVISAR: Tal vez el checked lo puedo modificar al final, solo hay que hacer append del colArr
-
         callback(colArr, arrSize, data);    // Llamo a la callback con el arreglo
 
     }
@@ -498,7 +496,7 @@ ColReg* detectPairs(World * myWorld, etaryGroupType Age)
 
     i = 0;
     int typeFound = 0;
-    while (typeFound < typeBlobs - 1)   // el ultimo typeBlob ya va a ser evaluado la colision
+    while (typeFound < typeBlobs - 1)  
     {
         while (myWorld->blobs[i].isAlive == false || myWorld->blobs[i].age != Age && i < MAX_BLOBS) i++;
         typeFound++;
@@ -510,7 +508,7 @@ ColReg* detectPairs(World * myWorld, etaryGroupType Age)
             while (myWorld->blobs[k].isAlive == false || myWorld->blobs[k].age != Age && k < MAX_BLOBS) k++;
             typeFound2++;
 
-            if (myWorld->blobs[i].isCollision(myWorld->blobs[k]))   /// OJO QUE ES REFERENCIA
+            if (myWorld->blobs[i].isCollision(myWorld->blobs[k]))  
             {
                 collisions++;
                 myRegister->pairs = (ColPair*) realloc(myRegister->pairs, collisions * sizeof(ColPair));
@@ -597,12 +595,10 @@ double averageDirection(unsigned int* colarr, unsigned int size, Blob arr[], uns
 {
     double angle = 0;
     float ejex = 0, ejey = 0;
-    printf("extra = %i\n", extra);
     for (int i = 0; i < size; i++)
     {
         ejey += cos((arr[colarr[i]].angle)* PI /180);
         ejex += sin((arr[colarr[i]].angle)* PI /180);
-        printf("angle inicial = %i\n", arr[colarr[i]].angle);
     }
 
     if (ejex == 0)
